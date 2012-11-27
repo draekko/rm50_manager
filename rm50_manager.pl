@@ -161,10 +161,10 @@ my @RSC3073=qw(
      11:HHOpen   12:Tom1     13:Tom2     14:Tom3     15:Tom4     16:Effect   17:Cowbell  18:Cymbell );
 
 # RSC3074 Peter Erskine (Jazz)
-my @RSC3074=qw(
-      1:   2:   3:   4:   5:   6:   7:   8:   9:  10:
-     11:  12:  13:  14:  15:  16:  17:  18:  19:  20:
-     21:  22:  23:  24: );
+my @RSC3074=(
+    '1:Rec BD p',  '2:Rec BD f',  '3:Jaz BD p',  '4:JazBDsfz',  '5:JazSnr p',  '6:JazSnr f',  '7:Rec Snr',   '8:BrshHit1',
+    '9:BrshTap1', '10:BrshTap2', '11:Sweep',    '12:Brush Up', '13:HH Pedal', '14:HH Tip L', '15:HH Tip R', '16:HH ClHvy',
+   '17:HH1/2 Op', '18:HH Open',  '19:JazzTom1', '20:JazzTom2', '21:RackTom1', '22:RackTom2', '23:RackTom3', '24:FloorTom' );
 
 # RSC3001 Percussion
 my @RSC3001=qw(
@@ -225,14 +225,8 @@ my @W7752=qw(1:TronixBD  2:RebelBD   3:BoomBD    4:MaddySN   5:SplashSN  6:Rimhi
             31:Shaker   32:Cabasa   33:Whistle  34:Tambo    35:Agogo    36:Bongo    37:Tabla );
 
 # Internal Wave 512K RAM (can contain max. 64 waves)
-my @WaveRAM=qw(
-      1:WRAM-001   2:WRAM-002   3:WRAM-003   4:WRAM-004   5:WRAM-005   6:WRAM-006   7:WRAM-007   8:WRAM-008   9:WRAM-009  10:WRAM-010
-     11:WRAM-011  12:WRAM-012  13:WRAM-013  14:WRAM-014  15:WRAM-015  16:WRAM-016  17:WRAM-017  18:WRAM-018  19:WRAM-019  20:WRAM-020
-     21:WRAM-021  22:WRAM-022  23:WRAM-023  24:WRAM-024  25:WRAM-025  26:WRAM-026  27:WRAM-027  28:WRAM-028  29:WRAM-029  30:WRAM-030
-     31:WRAM-031  32:WRAM-032  33:WRAM-033  34:WRAM-034  35:WRAM-035  36:WRAM-036  37:WRAM-037  38:WRAM-038  39:WRAM-039  40:WRAM-040
-     41:WRAM-041  42:WRAM-042  43:WRAM-043  44:WRAM-044  45:WRAM-045  46:WRAM-046  47:WRAM-047  48:WRAM-048  49:WRAM-049  50:WRAM-050
-     51:WRAM-051  52:WRAM-052  53:WRAM-053  54:WRAM-054  55:WRAM-055  56:WRAM-056  57:WRAM-057  58:WRAM-058  59:WRAM-059  60:WRAM-060
-     61:WRAM-061  62:WRAM-062  63:WRAM-063  64:WRAM-064 );
+
+my @WaveRAM=(); for (my $nr=1; $nr<=64; $nr++) { $WaveRAM[$nr-1]="$nr:WaveRAM"; }
 
 # RM50 Preset banks voice names
 my @BD_voices=("01:DR Kikin", "02:DR Hard",  "03:DR Boom",  "04:DR Danc1", "05:DR Danc2", "06:DR Danc3", "07:DR Danc4", "08:DR Jazz1",
@@ -307,7 +301,13 @@ my @SE_voices=("01:FX 7-11",  "02:FX B-Ben", "03:FX Joker", "04:FX Tubey", "05:F
                "41:FX S3Mth", "42:FX CYMth", "43:FX HCMth", "44:FX HOMth", "45:FX Type",  "46:FX Heart", "47:FX Tape",  "48:BA Nasti",
                "49:BA KillB", "50:BA Softa", "51:BA 30");
 
-# voice bank mappings (I-MX, C-MX, W-S1, W-S2, W-S3 to be added dynamically)
+my @IMX_voices=(); for (my $nr=1; $nr<=128; $nr++) { $IMX_voices[$nr-1]="$nr:UserVoice"; }
+
+my @CMX_voices=(); for (my $nr=1; $nr<=128; $nr++) { $CMX_voices[$nr-1]="$nr:UserVoice"; }
+
+# voice bank mappings
+my %usrvcehash=(
+    'I-MX'=>\@IMX_voices, 'C-MX'=>\@CMX_voices );
 my %prevcehash=(
     'P-BD'=>\@BD_voices, 'P-SD'=>\@SD_voices, 'P-TM'=>\@TM_voices, 'P-CY'=>\@CY_voices, 'P-PC'=>\@PC_voices, 'P-SE'=>\@SE_voices);
 my %intvcehash=(
@@ -319,7 +319,7 @@ my %wvevcehash=(
     'RSC3071' => \@RSC3071, 'RSC3072' => \@RSC3072, 'RSC3073' => \@RSC3073, 'RSC3074' => \@RSC3074,
     'W7701'   => \@W7701,   'W7702'   => \@W7702,   'W7704'   => \@W7704,   'W7705'   => \@W7705,
     'W7731'   => \@W7731,   'W7732'   => \@W7732,   'W7751'   => \@W7751,   'W7752'   => \@W7752 );
-my %voiceshash=(%prevcehash, %intvcehash);
+my %voiceshash=(%usrvcehash, %prevcehash, %intvcehash);
 
 # map banks to bank numbers used by parameter change messages 
 my %bankshash=(
@@ -348,7 +348,7 @@ my %wavehash=(
 # Each Waveform card has a unique ID
 my %waveid=(
     'RSC3001' => '', 'RSC3002' => '', 'RSC3003' => '', 'RSC3004' => '',
-    'RSC3071' => 17, 'RSC3072' => '', 'RSC3073' => '', 'RSC3074' => '',
+    'RSC3071' => 17, 'RSC3072' => '', 'RSC3073' => '', 'RSC3074' => '20',
     'W7701'   =>  3, 'W7702'   =>  2, 'W7704'   =>  7, 'W7705'   => '',
     'W7731'   =>  6, 'W7732'   => '', 'W7751'   =>  4, 'W7752'   => '' );
 
@@ -372,15 +372,17 @@ my @midi_devs=MidiPortList();
 # these widgets need to be global
 my @elm_wave_entry;
 my @wave_source_sel;
-my $vcdwn_btn;
 my $midiupload;
 my $midiin;
 my $midiout;
 my $voice_dwn_sel;
 my $bank_dwn_sel;
-my $selected_bank;
-my $selected_voice;
-my @banks_array;
+my $vcdwn_btn;
+
+# default values for voice download frame
+my $selected_bank="P-BD";
+my $selected_voice=${voiceshash{$selected_bank}}[0];
+my @banks_array=(sort(keys(%voiceshash)));
 
 # down arrow bitmap for pulldown menu
 my $darrow_bits=pack("b11"x10,
@@ -1156,10 +1158,10 @@ sub SendGenPaChMsg {
     }
 }
 
-# update element 1/2 wave sources when a wave card is removed or inserted
+# do all updates required when a wave card is removed or inserted
 sub InsRemWavCard {
     my $cardnr=$_[0];
-    # refresh wave bank list and reset selected wave if from removed card
+    # refresh elements wave bank list and reset selected wave if from removed card
     for (my $elm=1; $elm<=2; $elm++) {
         $wave_source_sel[$elm]->delete( 2, "end" );
         my $flag=0; # used to check if card used in voice has been removed
@@ -1188,20 +1190,47 @@ sub InsRemWavCard {
         }
     } elsif ($wave_card[$cardnr]=~/^[a-z,A-Z,0-9]+:.*/) {
         %voiceshash=(%voiceshash, "W-S$cardnr"=>$wvevcehash{$card});
-        RefreshVceDwnList();
+        if ($selected_bank eq "W-S$cardnr") {
+            RefreshVceDwnList();
+        }
     }
-    @banks_array=(sort(keys(%voiceshash)));
-    $bank_dwn_sel->delete( 0, "end" );
-    $bank_dwn_sel->insert("end", $_) for (@banks_array);
+    RefreshBnkDwnList();
 }
 
 # called when Data Card selection is changed
 sub InsRemDatCard {
-    # switch to bank 1 of MCD64
-    if    ($data_card eq $datacards[2]) { SendGenPaChMsg(4, 0, 0, 6, 7, 0, 0); }
-    # switch to bank 2 of MCD64
-    elsif ($data_card eq $datacards[3]) { SendGenPaChMsg(4, 0, 0, 6, 7, 0, 1); }
-    # voice download bank list refresh to be written
+    # no data card inserted
+    if ($data_card eq $datacards[0]) {
+        delete @voiceshash{keys %crdvcehash};
+        RefreshBnkDwnList();
+        if ($selected_bank=~/^C-\w\w$/) {
+            $selected_bank="P-BD";
+            RefreshVceDwnList();
+        }
+    }
+    # MCD32 data card inserted (only 1 bank)
+    elsif ($data_card eq $datacards[1]) {
+        %voiceshash=(%voiceshash, %crdvcehash);
+        RefreshBnkDwnList();
+    }
+    # MCD64 data card inserted using bank 1
+    elsif ($data_card eq $datacards[2]) {
+        SendGenPaChMsg(4, 0, 0, 6, 7, 0, 0);
+        %voiceshash=(%voiceshash, %crdvcehash);
+        RefreshBnkDwnList();
+    }
+    # MCD64 data card inserted using bank 2
+    elsif ($data_card eq $datacards[3]) {
+        SendGenPaChMsg(4, 0, 0, 6, 7, 0, 1);
+        %voiceshash=(%voiceshash, %crdvcehash);
+        RefreshBnkDwnList();
+    }
+}
+
+sub RefreshBnkDwnList {
+    @banks_array=(sort(keys(%voiceshash)));
+    $bank_dwn_sel->delete( 0, "end" );
+    $bank_dwn_sel->insert("end", $_) for (@banks_array);
 }
 
 sub RefreshVceDwnList {
@@ -2199,7 +2228,7 @@ sub Settings_Frame {
 
     if (!$LINUX) { $midiin->configure(-state=>'disabled'); }
 
-# Voice download from RM50 frame
+# Single voice download from RM50 frame
 
     my $voice_download=$mf11->Frame(%Frame_defaults
     )->pack(-anchor=>'n', -fill=>'both', -expand=>1, -padx=>4);
@@ -2210,10 +2239,6 @@ sub Settings_Frame {
 
     my $voice_dwn_sub=$voice_download->Frame(
     )->pack(-fill=>'both', -expand=>1, -pady=>14);
-
-    $selected_bank="P-BD";
-    $selected_voice=${voiceshash{$selected_bank}}[0];
-    @banks_array=(sort(keys(%voiceshash)));
 
     $voice_dwn_sub->Label(
         -text         => "Bank: ",
@@ -2255,9 +2280,8 @@ sub Settings_Frame {
     $vcdwn_btn=$voice_dwn_sub->Button(
         -font         => 'Sans 9',
         -text         => 'Download',
-        -command      => sub{ my $banknr=$bankshash{$selected_bank};
-                              my ($voicenr)=($selected_voice=~/^(\d+):.*/);
-                              RM50toPCSyxDmp(7,$banknr,$voicenr-1)}
+        -command      => sub{ my ($voicenr)=($selected_voice=~/^(\d+):.*/);
+                              RM50toPCSyxDmp(7, $bankshash{$selected_bank}, $voicenr-1); }
     )->grid(-row=>1, -column=>4, -padx=>36, -pady=>13);
 
     if (($midi_indev eq '') || ($midi_outdev eq '')) { $vcdwn_btn->configure(-state=>'disabled'); }
