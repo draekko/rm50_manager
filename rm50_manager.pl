@@ -314,6 +314,11 @@ my %intvcehash=(
     'I-BD'=>\@BD_voices, 'I-SD'=>\@SD_voices, 'I-TM'=>\@TM_voices, 'I-CY'=>\@CY_voices, 'I-PC'=>\@PC_voices, 'I-SE'=>\@SE_voices);
 my %crdvcehash=(
     'C-BD'=>\@BD_voices, 'C-SD'=>\@SD_voices, 'C-TM'=>\@TM_voices, 'C-CY'=>\@CY_voices, 'C-PC'=>\@PC_voices, 'C-SE'=>\@SE_voices);
+my %wvevcehash=(
+    'RSC3001' => \@RSC3001, 'RSC3002' => \@RSC3002, 'RSC3003' => \@RSC3003, 'RSC3004' => \@RSC3004,
+    'RSC3071' => \@RSC3071, 'RSC3072' => \@RSC3072, 'RSC3073' => \@RSC3073, 'RSC3074' => \@RSC3074,
+    'W7701'   => \@W7701,   'W7702'   => \@W7702,   'W7704'   => \@W7704,   'W7705'   => \@W7705,
+    'W7731'   => \@W7731,   'W7732'   => \@W7732,   'W7751'   => \@W7751,   'W7752'   => \@W7752 );
 my %voiceshash=(%prevcehash, %intvcehash);
 
 # map banks to bank numbers used by parameter change messages 
@@ -371,6 +376,11 @@ my $vcdwn_btn;
 my $midiupload;
 my $midiin;
 my $midiout;
+my $voice_dwn_sel;
+my $bank_dwn_sel;
+my $selected_bank;
+my $selected_voice;
+my @banks_array;
 
 # down arrow bitmap for pulldown menu
 my $darrow_bits=pack("b11"x10,
@@ -1168,7 +1178,21 @@ sub InsRemWavCard {
         }
     }
     # refresh download bank list adding/removing wave slots
-    
+    my ($card)=$wave_card[$cardnr]=~/^([a-z,A-Z,0-9]+):.*/;
+
+    if ($wave_card[$cardnr] eq ' -- empty slot -- ') {
+        delete $voiceshash{"W-S$cardnr"};
+        if ($selected_bank eq "W-S$cardnr") {
+            $selected_bank="P-BD";
+            RefreshVceDwnList();
+        }
+    } elsif ($wave_card[$cardnr]=~/^[a-z,A-Z,0-9]+:.*/) {
+        %voiceshash=(%voiceshash, "W-S$cardnr"=>$wvevcehash{$card});
+        RefreshVceDwnList();
+    }
+    @banks_array=(sort(keys(%voiceshash)));
+    $bank_dwn_sel->delete( 0, "end" );
+    $bank_dwn_sel->insert("end", $_) for (@banks_array);
 }
 
 # called when Data Card selection is changed
@@ -1180,6 +1204,11 @@ sub InsRemDatCard {
     # voice download bank list refresh to be written
 }
 
+sub RefreshVceDwnList {
+    $voice_dwn_sel->delete( 0, "end" );
+    $voice_dwn_sel->insert("end", $_) for (@{$voiceshash{$selected_bank}});
+    $selected_voice=${$voiceshash{$selected_bank}}[0];
+}
 # create an array of available midi ports
 sub MidiPortList {
     if ($LINUX) {
@@ -2022,6 +2051,7 @@ sub Settings_Frame {
     )->pack(-fill=>'x', -expand=>1, -pady=>14);
 
     for (my $i=1; $i<=3; $i++) {
+        my $card=$i;
         $wave_card_sub->Label(
             -text         => "Wave Card Slot $i: ",
             -font         => 'Sans 8'
@@ -2030,7 +2060,7 @@ sub Settings_Frame {
         my $wave_card_entry=$wave_card_sub->BrowseEntry(%BEntry_defaults,
             -variable     => \$wave_card[$i],
             -choices      => \@wavecards,
-            -browsecmd    => sub{ InsRemWavCard($i); },
+            -browsecmd    => sub{ InsRemWavCard($card); },
             -width        => 23
         )->grid(-row=>(int(($i+1)/3)), -column=>(int(($i)/3)*2+1), -pady=>8 );
 
@@ -2181,11 +2211,9 @@ sub Settings_Frame {
     my $voice_dwn_sub=$voice_download->Frame(
     )->pack(-fill=>'both', -expand=>1, -pady=>14);
 
-    my $voice_dwn_sel;
-    my $bank_dwn_sel;
-    my $selected_bank="P-BD";
-    my $selected_voice=${voiceshash{$selected_bank}}[0];
-    my @banks_array=(sort(keys(%voiceshash)));
+    $selected_bank="P-BD";
+    $selected_voice=${voiceshash{$selected_bank}}[0];
+    @banks_array=(sort(keys(%voiceshash)));
 
     $voice_dwn_sub->Label(
         -text         => "Bank: ",
@@ -2200,9 +2228,7 @@ sub Settings_Frame {
         -font         => 'Sans 9',
         -width        => 6,
         -listheight   => 10,
-        -browsecmd    => sub{ $voice_dwn_sel->delete( 0, "end" );
-                              $voice_dwn_sel->insert("end", $_) for (@{$voiceshash{$selected_bank}});
-                              $selected_voice=${$voiceshash{$selected_bank}}[0]; }
+        -browsecmd    => sub{ RefreshVceDwnList(); }
     )->grid(-row=>1, -column=>1);
 
     $bank_dwn_sel->Subwidget("choices")->configure(%choices_defaults);
