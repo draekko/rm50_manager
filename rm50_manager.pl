@@ -305,20 +305,87 @@ my @IMX_voices=(); for (my $nr=1; $nr<=128; $nr++) { $IMX_voices[$nr-1]="$nr:Use
 
 my @CMX_voices=(); for (my $nr=1; $nr<=128; $nr++) { $CMX_voices[$nr-1]="$nr:UserVoice"; }
 
-# voice bank mappings
+# RSC3001 Percussion card voice names
+my @RSC3001_voices=qw(
+      1:   2:   3:   4:   5:   6:   7:   8:   9:  10:
+     11:  12:  13:  14:  15:  16:  17:  18:  19:  20:
+     21:  22:  23:  24:  25:  26:  27:  28:  29:  30:
+     31:  32: );
+
+# RSC3002 FX Drums card voice names
+my @RSC3002_voices=qw(
+      1:   2:   3:   4:   5:   6:   7:   8:   9:  10:
+     11:  12:  13:  14:  15:  16:  17:  18:  19:  20:
+     21:  22:  23:  24:  25:  26:  27:  28:  29:  30:
+     31:  32: );
+
+# RSC3003 House & Rap card voice names
+my @RSC3003_voices=qw(
+      1:   2:   3:   4:   5:   6:   7:   8:   9:  10:
+     11:  12:  13:  14:  15:  16:  17:  18:  19:  20:
+     21:  22:  23:  24:  25:  26:  27:  28:  29:  30:
+     31:  32: );
+
+# RSC3004 Dance & Soul card voice names
+my @RSC3004_voices=qw(
+      1:   2:   3:   4:   5:   6:   7:   8:   9:  10:
+     11:  12:  13:  14:  15:  16:  17:  18:  19:  20:
+     21:  22:  23:  24:  25:  26:  27:  28:  29:  30:
+     31:  32: );
+
+# RSC3071 Dave Weckl card voice names
+my @RSC3071_voices=qw(
+      1:   2:   3:   4:   5:   6:   7:   8:   9:  10:
+     11:  12:  13:  14:  15:  16:  17:  18:  19:  20:
+     21:  22:  23:  24:  25:  26:  27:  28:  29:  30:
+     31:  32: );
+
+# RSC3072 Matt Sorum card voice names
+my @RSC3072_voices=qw(
+      1:   2:   3:   4:   5:   6:   7:   8:   9:  10:
+     11:  12:  13:  14:  15:  16:  17:  18:  19:  20:
+     21:  22:  23:  24:  25:  26:  27:  28:  29:  30:
+     31:  32: );
+
+# RSC3073 Tommy Aldridge voice names
+my @RSC3073_voices=qw(
+      1:   2:   3:   4:   5:   6:   7:   8:   9:  10:
+     11:  12:  13:  14:  15:  16:  17:  18:  19:  20:
+     21:  22:  23:  24:  25:  26:  27:  28:  29:  30:
+     31:  32: );
+
+# RSC3074 Peter Erskine voice names
+my @RSC3074_voices=qw(
+      1:   2:   3:   4:   5:   6:   7:   8:   9:  10:
+     11:  12:  13:  14:  15:  16:  17:  18:  19:  20:
+     21:  22:  23:  24:  25:  26:  27:  28:  29:  30:
+     31:  32: );
+
+# user voice bank mappings
 my %usrvcehash=(
     'I-MX'=>\@IMX_voices, 'C-MX'=>\@CMX_voices );
+
+# preset voice bank mappings
 my %prevcehash=(
     'P-BD'=>\@BD_voices, 'P-SD'=>\@SD_voices, 'P-TM'=>\@TM_voices, 'P-CY'=>\@CY_voices, 'P-PC'=>\@PC_voices, 'P-SE'=>\@SE_voices);
+
+# variation voice bank mappings
 my %intvcehash=(
     'I-BD'=>\@BD_voices, 'I-SD'=>\@SD_voices, 'I-TM'=>\@TM_voices, 'I-CY'=>\@CY_voices, 'I-PC'=>\@PC_voices, 'I-SE'=>\@SE_voices);
+
+# data card variation voice bank mappings
 my %crdvcehash=(
     'C-BD'=>\@BD_voices, 'C-SD'=>\@SD_voices, 'C-TM'=>\@TM_voices, 'C-CY'=>\@CY_voices, 'C-PC'=>\@PC_voices, 'C-SE'=>\@SE_voices);
+
+# wave card voice bank mappings (SY55/SY77 waveform cards don't contain voices so the RM50
+# autogenerates a default voice for each waveform, therefore we can reuse the waveform name lists)
 my %wvevcehash=(
-    'RSC3001' => \@RSC3001, 'RSC3002' => \@RSC3002, 'RSC3003' => \@RSC3003, 'RSC3004' => \@RSC3004,
-    'RSC3071' => \@RSC3071, 'RSC3072' => \@RSC3072, 'RSC3073' => \@RSC3073, 'RSC3074' => \@RSC3074,
+    'RSC3001' => \@RSC3001_voices, 'RSC3002' => \@RSC3002_voices, 'RSC3003' => \@RSC3003_voices, 'RSC3004' => \@RSC3004_voices,
+    'RSC3071' => \@RSC3071_voices, 'RSC3072' => \@RSC3072_voices, 'RSC3073' => \@RSC3073_voices, 'RSC3074' => \@RSC3074_voices,
     'W7701'   => \@W7701,   'W7702'   => \@W7702,   'W7704'   => \@W7704,   'W7705'   => \@W7705,
     'W7731'   => \@W7731,   'W7732'   => \@W7732,   'W7751'   => \@W7751,   'W7752'   => \@W7752 );
+
+# hash containing actual available voice banks
 my %voiceshash=(%usrvcehash, %prevcehash, %intvcehash);
 
 # map banks to bank numbers used by parameter change messages 
