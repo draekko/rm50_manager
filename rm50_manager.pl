@@ -447,7 +447,7 @@ my $bank_dwn_sel;
 my $vcdwn_btn;
 
 # default values for voice download frame
-my $selected_bank="P-BD";
+my $selected_bank="I-MX";
 my $selected_voice=${voiceshash{$selected_bank}}[0];
 my @banks_array=(sort(keys(%voiceshash)));
 
@@ -614,7 +614,7 @@ sub topMenubar {
     $mw->bind($mw, "<Control-a>"=>\&saveasFile);
     $mw->bind($mw, "<Control-s>"=>\&saveFile);
     $mw->bind($mw, "<Control-o>"=>\&loadFile);
-    $mw->bind($mw, "<Control-n>"=>\&newFile);
+    $mw->bind($mw, "<Control-n>"=>sub{ newFile(); UpdateWSel(1, 0); UpdateWSel(2, 0); });
     
 
     my $btn1=$mf1->Menubutton(-text=>'Edit', -underline=>0, -tearoff=>0, -anchor=>'w',
@@ -622,7 +622,7 @@ sub topMenubar {
     )->pack(-side=>"left");
 
     my $btn2=$mf1->Menubutton(-text=>'Help', -underline=>0, -tearoff=>0, -anchor=>'w',
-       -menuitems => [['command'=>'About',         -command=>\&About,      -underline=>0, -accelerator=>'Alt+A']]
+       -menuitems => [['command'=>'About', -accelerator=>'Alt+A', -command=>\&About, -underline=>0]]
     )->pack(-side=>'left');
     $mw->bind($mw, "<Alt-a>"=>\&About);
 }
@@ -1252,7 +1252,7 @@ sub InsRemWavCard {
     if ($wave_card[$cardnr] eq ' -- empty slot -- ') {
         delete $voiceshash{"W-S$cardnr"};
         if ($selected_bank eq "W-S$cardnr") {
-            $selected_bank="P-BD";
+            $selected_bank="I-MX";
             RefreshVceDwnList();
         }
     } elsif ($wave_card[$cardnr]=~/^[a-z,A-Z,0-9]+:.*/) {
@@ -1271,7 +1271,7 @@ sub InsRemDatCard {
         delete @voiceshash{keys %crdvcehash};
         RefreshBnkDwnList();
         if ($selected_bank=~/^C-\w\w$/) {
-            $selected_bank="P-BD";
+            $selected_bank="I-MX";
             RefreshVceDwnList();
         }
     }
@@ -2128,16 +2128,16 @@ sub Common_Frame {
 
 sub Settings_Frame {
     $mf11=$tab[0]->Frame(%Frame_defaults, -padx=>0, -pady=>0, -borderwidth=>0
-    )->pack(-side=>'top', -fill=>'x');
+    )->pack(-fill=>'both', -expand=>1);
 
 # photo of RM50 front panel (purely for decorative purposes)
     my $jpg1=$mf11->Photo( '-format'=>'jpeg', -file=>'yamaha_rm50.jpg');
     $mf11->Label(-image=>$jpg1, -borderwidth=>0, -relief=>'flat', -anchor=>'n',-height=>55
-    )->pack(-anchor=>'n', -fill=>'x', -expand=>1, -ipadx=>3);
+    )->pack(-anchor=>'n', -fill=>'x', -ipadx=>3);
 
 # Inserted Wave and Data Cards
     my $wave_card_fn=$mf11->Frame(%Frame_defaults
-    )->pack(-anchor=>'n', -fill=>'x', -expand=>1, -padx=>4, -pady=>4);
+    )->pack(-anchor=>'n', -fill=>'x', -padx=>4, -pady=>4);
 
     $wave_card_fn->Label(%TitleLbl_defaults,
         -text         => "Inserted Waveform and Data Cards"
@@ -2186,7 +2186,7 @@ sub Settings_Frame {
 # RM50 device number and I-MX (user) bank destination voice config boxes
 
     my $misc_settings=$mf11->Frame(%Frame_defaults
-    )->pack(-anchor=>'n', -fill=>'x', -expand=>1, -padx=>4);
+    )->pack(-anchor=>'n', -fill=>'x', -padx=>4);
 
     $misc_settings->Label(%TitleLbl_defaults,
         -text         => "Device and Destination Voice Settings"
@@ -2242,7 +2242,7 @@ sub Settings_Frame {
 # MIDI input and output devices selection
 
     my $midi_settings=$mf11->Frame(%Frame_defaults
-    )->pack(-anchor=>'n', -fill=>'x', -expand=>1, -padx=>4, -pady=>4);
+    )->pack(-anchor=>'n', -fill=>'x', -padx=>4, -pady=>4);
 
     $midi_settings->Label(%TitleLbl_defaults,
         -text         => "MIDI Devices Configuration"
@@ -2304,10 +2304,10 @@ sub Settings_Frame {
 
     $voice_download->Label(%TitleLbl_defaults,
         -text         => "Voice Download from RM50"
-    )->pack(-fill=>'x', -expand=>1);
+    )->pack(-anchor=>'n', -fill=>'x', -expand=>1);
 
     my $voice_dwn_sub=$voice_download->Frame(
-    )->pack(-fill=>'both', -expand=>1, -pady=>14);
+    )->pack(-anchor=>'n', -fill=>'x', -expand=>1, -pady=>14);
 
     $voice_dwn_sub->Label(
         -text         => "Bank: ",
@@ -2351,7 +2351,7 @@ sub Settings_Frame {
         -text         => 'Download',
         -command      => sub{ my ($voicenr)=($selected_voice=~/^(\d+):.*/);
                               RM50toPCSyxDmp(7, $bankshash{$selected_bank}, $voicenr-1); }
-    )->grid(-row=>1, -column=>4, -padx=>36, -pady=>10);
+    )->grid(-row=>1, -column=>4, -padx=>36, -pady=>8);
 
     if (($midi_indev eq '') || ($midi_outdev eq '')) { $vcdwn_btn->configure(-state=>'disabled'); }
 
