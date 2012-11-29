@@ -95,7 +95,7 @@ my %Frame_defaults=(
 my %BEntry_defaults=(
     -state        => 'readonly',
     -borderwidth  => 1,
-    -font         => 'Fixed 8',
+    -font         => 'Sans 8',
     -style        => 'MSWin32',
     -highlightthickness => 0,
     -disabledforeground => 'black',
@@ -543,7 +543,7 @@ $mw->optionAdd('*Entry.highlightThickness', 0, 99);
 # set default scrollbar properties
 $mw->optionAdd('*Scrollbar.borderWidth', 1, 99);
 $mw->optionAdd('*Scrollbar.highlightThickness', 0, 99);
-$mw->optionAdd('*Scrollbar.Width', 10, 99);
+if ($LINUX) {$mw->optionAdd('*Scrollbar.Width', 10, 99);}
 # set default button properties
 $mw->optionAdd('*Button.borderWidth', 1, 99);
 # set default canvas properties
@@ -642,7 +642,7 @@ sub StatusBar {
         -anchor       => 'w',
         -relief       => 'sunken',
         -borderwidth  => 1,
-        -width        => 80,
+        -width        => 82,
         -font         => 'Sans 9',
         -textvariable => \$filename
     )->pack(-side=>'left', -padx=>2, -pady=>2);
@@ -2148,8 +2148,10 @@ sub Settings_Frame {
 
     for (my $i=1; $i<=3; $i++) {
         my $card=$i;
+        my $spc="";
+        if ($i==3) { $spc=" "; }
         $wave_card_sub->Label(
-            -text         => "Wave Card Slot $i: ",
+            -text         => $spc."Wave Card $i:",
             -font         => 'Sans 8'
         )->grid(-row=>(int(($i+1)/3)), -column=>(int(($i)/3)*2), -pady=>8);
 
@@ -2165,7 +2167,7 @@ sub Settings_Frame {
     }
 
     $wave_card_sub->Label(
-            -text         => "Data Card Slot: ",
+            -text         => "Data Card:",
             -font         => 'Sans 8'
     )->grid(-row=>0, -column=>2, -pady=>8, -sticky=>'e');
 
@@ -2349,7 +2351,7 @@ sub Settings_Frame {
         -text         => 'Download',
         -command      => sub{ my ($voicenr)=($selected_voice=~/^(\d+):.*/);
                               RM50toPCSyxDmp(7, $bankshash{$selected_bank}, $voicenr-1); }
-    )->grid(-row=>1, -column=>4, -padx=>36, -pady=>13);
+    )->grid(-row=>1, -column=>4, -padx=>36, -pady=>10);
 
     if (($midi_indev eq '') || ($midi_outdev eq '')) { $vcdwn_btn->configure(-state=>'disabled'); }
 
