@@ -147,18 +147,19 @@ my @waves=qw(
 
 # RSC3071 Dave Weckl (Modern Jazz) card Waveforms
 my @RSC3071=qw(
-      1:BD1       2:SD1Hard   3:SD1Soft   4:SD2Hard   5:SD2Soft   6:HHPedalL  7:HHTipL    8:HHHvyL    9:HHLightL 10:HHOpenL
-     11:HHTipR   12:HHHvyR   13:Tom1     14:Tom2     15:Tom3     16:Tom4     17:CowTip   18:CowOpen );
+      1:BD1      2:SD1Hard  3:SD1Soft  4:SD2Hard  5:SD2Soft  6:HHPedalL  7:HHTipL  8:HHHvyL  9:HHLightL
+     10:HHOpenL 11:HHTipR  12:HHHvyR  13:Tom1    14:Tom2    15:Tom3     16:Tom4   17:CowTip 18:CowOpen );
 
-# RSC3072 Matt Sorum (Rock) card Waveforms
-my @RSC3072=qw(
-      1:BD1       2:SD1Hard   3:SD2Hard   4:SD2Soft   5:SD3Hard   6:SD4Hard   7:HHClosed  8:HHHvy     9:HHQtr    10:HHOpen
-     11:Tom1     12:Tom2     13:Tom3     14:Tom4     15:Cymbell );
+# RSC3072 Tommy Aldridge (Heavy Metal) card Waveforms
+my @RSC3072=(
+     '1:BD1',      '2:SD1 Soft',  '3:SD1 Hard',  '4:SD2 Soft',  '5:SD2 Hard',  '6:SD3 Soft',  '7:SD3 Hard',  '8:HHPedal',
+     '9:HHMed',   '10:HHHvy',    '11:HHOpen',   '12:Tom 1',    '13:Tom 2',    '14:Tom 3',    '15:Tom 4',    '16:Effect',
+    '17:Cowbell', '18:Cymbell' );
 
-# RSC3073 Tommy Aldridge (Heavy Metal) card Waveforms
-my @RSC3073=qw(
-      1:BD1       2:SD1Soft   3:SD1Hard   4:SD2Soft   5:SD2Hard   6:SD3Soft   7:SD3Hard   8:HHPedal   9:HHMed    10:HHHvy
-     11:HHOpen   12:Tom1     13:Tom2     14:Tom3     15:Tom4     16:Effect   17:Cowbell  18:Cymbell );
+# RSC3073 Matt Sorum (Rock) card Waveforms
+my @RSC3073=(
+     '1:BD1',      '2:SD1 Hard',  '3:SD2 Hard',  '4:SD2 Soft',  '5:SD3 Hard',  '6:SD4 Hard',  '7:HHClosed',  '8:HHHvy',
+     '9:HHQtr',   '10:HHOpen',   '11:Tom 1',    '12:Tom 2',    '13:Tom 3',    '14:Tom 4',    '15:Cymbell' );
 
 # RSC3074 Peter Erskine (Jazz) card Waveforms
 my @RSC3074=(
@@ -167,16 +168,17 @@ my @RSC3074=(
    '17:HH1/2 Op', '18:HH Open',  '19:JazzTom1', '20:JazzTom2', '21:RackTom1', '22:RackTom2', '23:RackTom3', '24:FloorTom' );
 
 # RSC3001 Percussion card Waveforms
-my @RSC3001=qw(
-      1:   2:   3:   4:   5:   6:   7:   8:   9:  10:
-     11:  12:  13:  14:  15:  16:  17:  18:  19:  20:
-     21:  22:  23:  24: );
+my @RSC3001=(
+     '1:BongoHi2',  '2:BongoLo2',  '3:Cabasa 2',  '4:Claps 1',   '5:Claps 2',  '6:Castanet',  '7:Cuica',     '8:Maracas',
+     '9:Pandiero', '10:Shekele1', '11:Shekele2', '12:Shaker 2', '13:Surdo',   '14:TemplBlk', '15:TalkDrum', '16:Tamborim',
+    '17:Vibraslp', '18:Chaxixi1', '19:Chaxixi2', '20:Tabla 1',  '21:Tabla 2', '22:TimbalRl', '23:Timbale2', '24:Timpani' );
 
 # RSC3002 FX Drums card Waveforms
-my @RSC3002=qw(
-      1:Ambient   2:Bang      3:BD1       4:BD2       5:BigBang   6:Clap      7:Metal1    8:MiniCym   9:Donk     10:Door
-     11:Tube1    12:Drum1    13:Metal2   14:Analog   15:Dunk     16:Metal3   17:Metal4   18:Cow      19:Nurg     20:Punch
-     21:Pot      22:Scratch  23:Vibro    24:SD1      25:Squeek   26:Zep      27:Zing     28:AmbientR );
+my @RSC3002=(
+     '1:Ambient',  '2:Bang',   '3:BD 1',    '4:BD 2',    '5:BigBang',  '6:Clap',     '7:Metal 1',  '8:MiniCym',
+     '9:Donk',    '10:Door',  '11:Tube 1', '12:Drum 1', '13:Metal 2', '14:Analog',  '15:Dunk',    '16:Metal 3',
+    '17:Metal 4', '18:Cow',   '19:Nurg',   '20:Punch',  '21:Pot',     '22:Scratch', '23:Vibro',   '24:SD 1', 
+    '25:Squeek',  '26:Zap',   '27:Zing',   '28:AmbientR' );
 
 # RSC3003 House & Rap card Waveforms
 my @RSC3003=qw(
@@ -193,7 +195,7 @@ my @RSC3004=qw(
      31:AnaNoiz2 32:GTRNoiz );
 
 # W7701 / W5501 Sax 1 (4 waves) card Waveforms
-my @W7701=qw( 1:TSaxSoft 2:TSaxHard 3:ASaxSoft 4:ASaxHard );
+my @W7701=('1:TSaxSoft', '2:TSaxHard', '3:ASaxSoft', '4:ASaxHard');
 
 # W7702 / W5502 Drums 1 (12 waves) card Waveforms
 my @W7702=('1:Kick', '2:SD 1 Dry', '3:SD 1 Rim', '4:SD 2', '5:SD 3', '6:Tom 1', '7:Tom 2', '8:HH Light', '9:HH Mid',
@@ -203,7 +205,7 @@ my @W7702=('1:Kick', '2:SD 1 Dry', '3:SD 1 Rim', '4:SD 2', '5:SD 3', '6:Tom 1', 
 my @W7704=('1:Trumpets', '2:Tenors', '3:Baritone', '4:Blast', '5:Roll', '6:Sax Pad');
 
 # W7705 / W5505 String Section (2 waves) card Waveforms
-my @W7705=qw( 1:Strings 2:Pizz );
+my @W7705=('1:Strings', '2:Pizz');
 
 # W7731 / W5531 Syn Wave 1 (16 waves) card Waveforms
 my @W7731=('1:Syn Brs1', '2:AnlgSaw3', '3:Pan Pipe', '4:NewroStr', '5:Glasphon', '6:TwinBell', '7:Slap E.P', '8:W Steel',
@@ -225,7 +227,6 @@ my @W7752=qw(1:TronixBD  2:RebelBD   3:BoomBD    4:MaddySN   5:SplashSN  6:Rimhi
             31:Shaker   32:Cabasa   33:Whistle  34:Tambo    35:Agogo    36:Bongo    37:Tabla );
 
 # Internal Wave 512K RAM (can contain max. 64 waves) Waveforms
-
 my @WaveRAM=(); for (my $nr=1; $nr<=64; $nr++) { $WaveRAM[$nr-1]="$nr:WaveRAM"; }
 
 # RM50 Preset/Variation banks voice names
@@ -306,18 +307,18 @@ my @IMX_voices=(); for (my $nr=1; $nr<=128; $nr++) { $IMX_voices[$nr-1]="$nr:Use
 my @CMX_voices=(); for (my $nr=1; $nr<=128; $nr++) { $CMX_voices[$nr-1]="$nr:UserVoice"; }
 
 # RSC3001 Percussion card voice names
-my @RSC3001_voices=qw(
-      1:   2:   3:   4:   5:   6:   7:   8:   9:  10:
-     11:  12:  13:  14:  15:  16:  17:  18:  19:  20:
-     21:  22:  23:  24:  25:  26:  27:  28:  29:  30:
-     31:  32: );
+my @RSC3001_voices=(
+     '1:L.Bg Slp',  '2:Cabasa',    '3:Cuica Lo',  '4:Pandiero',  '5:ShekereD',  '6:TemplBlk',  '7:H.Bg Slp',  '8:Castanet', 
+     '9:MaracasD', '10:RiceShk',  '11:ShekereT', '12:Surdo',    '13:Tamborim', '14:Tabla Lo', '15:Caxixi L', '16:TimbalRl',
+    '17:Timpani',  '18:Clap 2',   '19:TalkDr L', '20:Tabla Hi', '21:Caxixi H', '22:Timbal H', '23:Timbal L', '24:Clap 3',
+    '25:TalkDr H', '26:Cuica Hi', '27:AnaCowbl', '28:TimPaira', '29:Tambdiro', '30:Squeeze',  '31:Vibraslp', '32:Den Den' );
 
 # RSC3002 FX Drums card voice names
-my @RSC3002_voices=qw(
-      1:   2:   3:   4:   5:   6:   7:   8:   9:  10:
-     11:  12:  13:  14:  15:  16:  17:  18:  19:  20:
-     21:  22:  23:  24:  25:  26:  27:  28:  29:  30:
-     31:  32: );
+my @RSC3002_voices=(
+     '1:SwishHat',  '2:SwishWnd',  '3:BigDoor',   '4:MotorSnr',  '5:BuickKik',  '6:Beater',    '7:Growler',   '8:ShokClap',
+     '9:MtlBongo', '10:MTLonMTL', '11:RicoTom',  '12:SnareAir', '13:DarkTom',  '14:WhaBongo', '15:UpSplash', '16:TomsFlor',
+    '17:TubeArgh', '18:SnapESnr', '19:CANtoCAN', '20:TinyGong', '21:PitchMtl', '22:MtlFence', '23:BigShot',  '24:Ringer',
+    '25:Scratch',  '26:Them',     '27:CannonSn', '28:Whales',   '29:EastPerc', '30:FlyBy',    '31:ShockHat', '32:FrogDrum' );
 
 # RSC3003 House & Rap card voice names
 my @RSC3003_voices=qw(
@@ -340,26 +341,26 @@ my @RSC3071_voices=qw(
      21:  22:  23:  24:  25:  26:  27:  28:  29:  30:
      31:  32: );
 
-# RSC3072 Matt Sorum card voice names
-my @RSC3072_voices=qw(
-      1:   2:   3:   4:   5:   6:   7:   8:   9:  10:
-     11:  12:  13:  14:  15:  16:  17:  18:  19:  20:
-     21:  22:  23:  24:  25:  26:  27:  28:  29:  30:
-     31:  32: );
+# RSC3072 Tommy Aldridge voice names
+my @RSC3072_voices=(
+     '1:BD1 L',  '2:BD1 R',   '3:BD1 Dry',   '4:BD 2',      '5:SD1',       '6:SD2',       '7:SD3',       '8:SD4',
+     '9:SD5',   '10:Foot',   '11:Closed',   '12:Shld Hvy', '13:Open',     '14:Tip/Shld', '15:Tom1',     '16:Tom2',
+    '17:Tom3',  '18:Tom4',   '19:Tom5',     '20:Tom6',     '21:Cowbell',  '22:Crash',    '23:China',    '24:Ridebel',
+    '25:Ride',  '26:Splash', '27:Pwr Tm 1', '28:Pwr Tm 2', '29:Pwr Tm 3', '30:Pwr Tm 4', '31:Pwr Tm 5', '32:Pwr Tm 6' );
 
-# RSC3073 Tommy Aldridge voice names
-my @RSC3073_voices=qw(
-      1:   2:   3:   4:   5:   6:   7:   8:   9:  10:
-     11:  12:  13:  14:  15:  16:  17:  18:  19:  20:
-     21:  22:  23:  24:  25:  26:  27:  28:  29:  30:
-     31:  32: );
+# RSC3073 Matt Sorum card voice names
+my @RSC3073_voices=(
+     '1:BD1 L',     '2:BD1 R',     '3:BD1 Dry',   '4:BD 2',      '5:SD1',       '6:SD2',       '7:SD3',       '8:SD4',
+     '9:SD5',      '10:Tip',      '11:1/4 Open', '12:Open',     '13:Foot',     '14:Tom 1',    '15:Tom 2',    '16:Tom 3',
+    '17:Tom 4',    '18:Tom 5',    '19:Tom 6',    '20:Tom 7',    '21:Tom 8',    '22:Cowbell',  '23:Crash Hi', '24:China',
+    '25:RideBell', '26:Big Bang', '27:Gong',     '28:Crash Lo', '29:Pwr Tm 2', '30:Pwr Tm 3', '31:Pwr Tm 4', '32:Shoulder' );
 
 # RSC3074 Peter Erskine voice names
-my @RSC3074_voices=qw(
-      1:   2:   3:   4:   5:   6:   7:   8:   9:  10:
-     11:  12:  13:  14:  15:  16:  17:  18:  19:  20:
-     21:  22:  23:  24:  25:  26:  27:  28:  29:  30:
-     31:  32: );
+my @RSC3074_voices=(
+     '1:Rec BD p',  '2:Rec BD f',  '3:RecBDp/f',  '4:Jaz BD p',  '5:JazBDp/f',  '6:JazBDsfz',  '7:Jazz SD',   '8:Rec SD',
+     '9:BrshHit1', '10:BrshTap1', '11:BrshTap2', '12:Sweep',    '13:Brush Up', '14:Crosstik', '15:HH Pedal', '16:HH Tip L',
+    '17:HH Tip R', '18:HH ClHvy', '19:HH1/2 Op', '20:HH Open',  '21:JazzTom1', '22:JazzTom2', '23:RackTom1', '24:RackTom2',
+    '25:RackTom3', '26:Flr Tom1', '27:Flr Tom2', '28:SizzCym',  '29:Ride',     '30:Ridebell', '31:Crash',    '32:China' );
 
 # user voice bank mappings
 my %usrvcehash=(
@@ -401,16 +402,18 @@ my @vlcurves=qw(
     7:Hard2  8:Easy1     9:Easy2     10:Crossfade1 11:Crossfade2 12:Crossfade3 );
 
 # Wave Cards (the RM50 can use RY30, SY55 and SY77 wave cards)
-my @wavecards=(' -- empty slot -- ', 'RSC3001:Percussion',  'RSC3002:FX Drums',       'RSC3003:House & Rap',   'RSC3004:Dance & Soul',
-               'RSC3071:Dave Weckl', 'RSC3072:Matt Sorum',  'RSC3073:Tommy Aldridge', 'RSC3074:Peter Erskine', 'W7701:Sax 1',
-               'W7702:Drums 1',      'W7704:Brass Section', 'W7705:String Section',   'W7731:Syn Wave 1',      'W7732:Syn Wave 2',
-               'W7751:Rock & Pop',   'W7752:House & Latin' );
+my @wavecards=( ' -- empty slot -- ',
+    'RSC3001: Percussion', 'RSC3002: FX Drums',       'RSC3003: House & Rap', 'RSC3004: Dance & Soul',
+    'RSC3071: Dave Weckl', 'RSC3072: Tommy Aldridge', 'RSC3073: Matt Sorum',  'RSC3074: Peter Erskine',
+    'W7701: Sax 1',        'W7702: Drums 1',          'W7704: Brass Section', 'W7705: String Section',
+    'W7731: Syn Wave 1',   'W7732: Syn Wave 2',       'W7751: Rock & Pop',    'W7752: House & Latin' );
 
 # map banks names to waveform lists
-my %wavehash=(
-    'Preset'  => \@waves,   'IntRAM'  => \@WaveRAM, 'RSC3001' => \@RSC3001, 'RSC3002' => \@RSC3002, 'RSC3003' => \@RSC3003, 'RSC3004' => \@RSC3004,
-    'RSC3071' => \@RSC3071, 'RSC3072' => \@RSC3072, 'RSC3073' => \@RSC3073, 'RSC3074' => \@RSC3074, 'W7701'   => \@W7701,   'W7702'   => \@W7702,
-    'W7704'   => \@W7704,   'W7705'   => \@W7705,   'W7731'   => \@W7731,   'W7732'   => \@W7732,   'W7751'   => \@W7751,   'W7752'   => \@W7752 );
+my %wavehash=( 'Preset'  => \@waves,   'IntRAM'  => \@WaveRAM,
+    'RSC3001' => \@RSC3001, 'RSC3002' => \@RSC3002, 'RSC3003' => \@RSC3003, 'RSC3004' => \@RSC3004,
+    'RSC3071' => \@RSC3071, 'RSC3072' => \@RSC3072, 'RSC3073' => \@RSC3073, 'RSC3074' => \@RSC3074,
+    'W7701'   => \@W7701,   'W7702'   => \@W7702,   'W7704'   => \@W7704,   'W7705'   => \@W7705,
+    'W7731'   => \@W7731,   'W7732'   => \@W7732,   'W7751'   => \@W7751,   'W7752'   => \@W7752 );
 
 # Each Waveform card has a unique ID
 my %waveid=(
