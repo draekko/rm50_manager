@@ -146,9 +146,10 @@ my @waves=qw(
     131:P50Wave 132:SawWave 133:TriWave 256:--off--- );
 
 # RSC3071 Dave Weckl (Modern Jazz) card Waveforms
-my @RSC3071=qw(
-    01:BD1     02:SD1Hard 03:SD1Soft 04:SD2Hard 05:SD2Soft 06:HHPedalL 07:HHTipL 08:HHHvyL 09:HHLightL
-    10:HHOpenL 11:HHTipR  12:HHHvyR  13:Tom1    14:Tom2    15:Tom3     16:Tom4   17:CowTip 18:CowOpen );
+my @RSC3071=(
+    '01:BD1',      '02:SD1 Hard', '03:SD1 Soft', '04:SD2 Hard', '05:SD2 Soft', '06:HHPedalL', '07:HHTip L', '08:HHHvy L',
+    '09:HHLightL', '10:HHOpen L', '11:HHTip R',  '12:HHHvy R',  '13:Tom 1',    '14:Tom 2',    '15:Tom 3',   '16:Tom 4',
+    '17:Cow Tip',  '18:Cow Open' );
 
 # RSC3072 Tommy Aldridge (Heavy Metal) card Waveforms
 my @RSC3072=(
@@ -335,11 +336,11 @@ my @RSC3004_voices=qw(
     31:  32: );
 
 # RSC3071 Dave Weckl card voice names
-my @RSC3071_voices=qw(
-    01:  02:  03:  04:  05:  06:  07:  08:  09:  10:
-    11:  12:  13:  14:  15:  16:  17:  18:  19:  20:
-    21:  22:  23:  24:  25:  26:  27:  28:  29:  30:
-    31:  32: );
+my @RSC3071_voices=(
+    '01:BD1',      '02:BD2',      '03:SD1',    '04:SD2',     '05:SD3',      '06:Foot L',   '07:Closed L', '08:MedCls L',
+    '09:MedOpn L', '10:ShouldrL', '11:Open L', '12:Tip R',   '13:ShouldrR', '14:T/SRight', '15:Tom 1',    '16:Tom 2',
+    '17:Tom 3',    '18:Tom 4',    '19:Tom 1B', '20:Tom 2B',  '21:Tom 3B',   '22:Tom 4B',   '23:Ride',     '24:RideBell',
+    '25:Splash',   '26:Crash',    '27:China',  '28:Cowbel1', '29:Cowbel2',  '30:XFadeCow', '31:Crosstik', '32:Choker' );
 
 # RSC3072 Tommy Aldridge voice names
 my @RSC3072_voices=(
@@ -1389,16 +1390,16 @@ sub RM50toPCSyxDmp {
         [$header.$snglktdmp,'single kit dump']
     );
     # send bulk dump request to RM50 and receive dump
+    my $tmp_dump='';
     if ($LINUX) {
         MIDI::ALSA::output(MIDI::ALSA::sysex($dev_nr-1, $req_strg[$type][0], 0));
-        my $tmp_dump;
         while (1) {
             # read next ALSA input event
             my @alsaevent=MIDI::ALSA::input();
             # if the input connection has disappeared then exit
             if ( $alsaevent[0] == SND_SEQ_EVENT_PORT_UNSUBSCRIBED() ) {
                 Error("Error: MIDI connection dropped.");
-                return 1;
+                return '';
             }
             # if we have received a sysex input event then do this
             elsif ( $alsaevent[0] == SND_SEQ_EVENT_SYSEX() ) {
@@ -1412,7 +1413,18 @@ sub RM50toPCSyxDmp {
                 }
             }
         }
-        my $result=SysexValidate($tmp_dump);
+    } elsif ($WINDOWS) {
+        # add Windows specific code here
+    }
+    return $tmp_dump;
+}
+
+# request, receive and validate a single voice dump
+sub RcvSnglVceDmp {
+    my $sbank=$_[0];
+    my $snr=$_[1];
+    my $tmp_dump=RM50toPCSyxDmp(7, $sbank, $snr);
+    my $result=SysexValidate($tmp_dump);
         if ($result eq 'ok') {
             $sysex_dump=$tmp_dump;
             SysexRead();
@@ -1423,9 +1435,6 @@ sub RM50toPCSyxDmp {
             Error("Error: $result");
             return 1;
         }
-    } elsif ($WINDOWS) {
-        # add Windows specific code here
-    }
 }
 
 #-------------------------------------------------------------------------------------------------------------------------
@@ -2353,7 +2362,7 @@ sub Settings_Frame {
         -font         => 'Sans 9',
         -text         => 'Download',
         -command      => sub{ my ($voicenr)=($selected_voice=~/^(\d+):.*/);
-                              RM50toPCSyxDmp(7, $bankshash{$selected_bank}, $voicenr-1); }
+                              RcvSnglVceDmp($bankshash{$selected_bank}, $voicenr-1); }
     )->grid(-row=>1, -column=>4, -padx=>36, -pady=>8);
 
     if (($midi_indev eq '') || ($midi_outdev eq '')) { $vcdwn_btn->configure(-state=>'disabled'); }
