@@ -147,20 +147,20 @@ my @waves=qw(
 
 # RSC3071 Dave Weckl (Modern Jazz) card Waveforms
 my @RSC3071=(
-    '01:BD1',      '02:SD1 Hard', '03:SD1 Soft', '04:SD2 Hard', '05:SD2 Soft', '06:HHPedalL', '07:HHTip L', '08:HHHvy L',
-    '09:HHLightL', '10:HHOpen L', '11:HHTip R',  '12:HHHvy R',  '13:Tom 1',    '14:Tom 2',    '15:Tom 3',   '16:Tom 4',
+    '01:BD1',      '02:SD1 Hard', '03:SD1 Soft', '04:SD2 Hard', '05:SD2 Soft', '06:HHPedalL', '07:HHTip L',  '08:HHHvy L',
+    '09:HHLightL', '10:HHOpen L', '11:HHTip R',  '12:HHHvy R',  '13:Tom 1',    '14:Tom 2',    '15:Tom 3',    '16:Tom 4',
     '17:Cow Tip',  '18:Cow Open' );
 
 # RSC3072 Tommy Aldridge (Heavy Metal) card Waveforms
 my @RSC3072=(
-    '01:BD1',     '02:SD1 Soft', '03:SD1 Hard', '04:SD2 Soft', '05:SD2 Hard', '06:SD3 Soft', '07:SD3 Hard', '08:HHPedal',
-    '09:HHMed',   '10:HHHvy',    '11:HHOpen',   '12:Tom 1',    '13:Tom 2',    '14:Tom 3',    '15:Tom 4',    '16:Effect',
-    '17:Cowbell', '18:Cymbell' );
+    '01:BD1',      '02:SD1 Soft', '03:SD1 Hard', '04:SD2 Soft', '05:SD2 Hard', '06:SD3 Soft', '07:SD3 Hard', '08:HHPedal',
+    '09:HHMed',    '10:HHHvy',    '11:HHOpen',   '12:Tom 1',    '13:Tom 2',    '14:Tom 3',    '15:Tom 4',    '16:Effect',
+    '17:Cowbell',  '18:Cymbell' );
 
 # RSC3073 Matt Sorum (Rock) card Waveforms
 my @RSC3073=(
-    '01:BD1',     '02:SD1 Hard', '03:SD2 Hard', '04:SD2 Soft', '05:SD3 Hard', '06:SD4 Hard', '07:HHClosed',  '08:HHHvy',
-    '09:HHQtr',   '10:HHOpen',   '11:Tom 1',    '12:Tom 2',    '13:Tom 3',    '14:Tom 4',    '15:Cymbell' );
+    '01:BD1',      '02:SD1 Hard', '03:SD2 Hard', '04:SD2 Soft', '05:SD3 Hard', '06:SD4 Hard', '07:HHClosed', '08:HHHvy',
+    '09:HHQtr',    '10:HHOpen',   '11:Tom 1',    '12:Tom 2',    '13:Tom 3',    '14:Tom 4',    '15:Cymbell' );
 
 # RSC3074 Peter Erskine (Jazz) card Waveforms
 my @RSC3074=(
@@ -170,23 +170,23 @@ my @RSC3074=(
 
 # RSC3001 Percussion card Waveforms
 my @RSC3001=(
-    '01:BongoHi2', '02:BongoLo2', '03:Cabasa 2', '04:Claps 1',  '05:Claps 2', '06:Castanet', '07:Cuica',    '08:Maracas',
-    '09:Pandiero', '10:Shekele1', '11:Shekele2', '12:Shaker 2', '13:Surdo',   '14:TemplBlk', '15:TalkDrum', '16:Tamborim',
-    '17:Vibraslp', '18:Chaxixi1', '19:Chaxixi2', '20:Tabla 1',  '21:Tabla 2', '22:TimbalRl', '23:Timbale2', '24:Timpani' );
+    '01:BongoHi2', '02:BongoLo2', '03:Cabasa 2', '04:Claps 1',  '05:Claps 2',  '06:Castanet', '07:Cuica',    '08:Maracas',
+    '09:Pandiero', '10:Shekele1', '11:Shekele2', '12:Shaker 2', '13:Surdo',    '14:TemplBlk', '15:TalkDrum', '16:Tamborim',
+    '17:Vibraslp', '18:Chaxixi1', '19:Chaxixi2', '20:Tabla 1',  '21:Tabla 2',  '22:TimbalRl', '23:Timbale2', '24:Timpani' );
 
 # RSC3002 FX Drums card Waveforms
 my @RSC3002=(
-    '01:Ambient', '02:Bang',  '03:BD 1',   '04:BD 2',   '05:BigBang', '06:Clap',    '07:Metal 1', '08:MiniCym',
-    '09:Donk',    '10:Door',  '11:Tube 1', '12:Drum 1', '13:Metal 2', '14:Analog',  '15:Dunk',    '16:Metal 3',
-    '17:Metal 4', '18:Cow',   '19:Nurg',   '20:Punch',  '21:Pot',     '22:Scratch', '23:Vibro',   '24:SD 1', 
-    '25:Squeek',  '26:Zap',   '27:Zing',   '28:AmbientR' );
+    '01:Ambient',  '02:Bang',     '03:BD 1',     '04:BD 2',     '05:BigBang',  '06:Clap',     '07:Metal 1',  '08:MiniCym',
+    '09:Donk',     '10:Door',     '11:Tube 1',   '12:Drum 1',   '13:Metal 2',  '14:Analog',   '15:Dunk',     '16:Metal 3',
+    '17:Metal 4',  '18:Cow',      '19:Nurg',     '20:Punch',    '21:Pot',      '22:Scratch',  '23:Vibro',    '24:SD 1', 
+    '25:Squeek',   '26:Zap',      '27:Zing',     '28:AmbientR' );
 
 # RSC3003 House & Rap card Waveforms
 my @RSC3003=qw(
-    01:  02:  03:  04:  05:  06:  07:  08:  09:  10:
-    11:  12:  13:  14:  15:  16:  17:  18:  19:  20:
-    21:  22:  23:  24:  25:  26:  27:  28:  29:  30:
-    31:  32: );
+    01:  02:  03:  04:  05:  06:  07:  08:
+    09:  10:  11:  12:  13:  14:  15:  16:
+    17:  18:  19:  20:  21:  22:  23:  24:
+    25:  26:  27:  28:  29:  30:  31:  32: );
 
 # RSC3004 Dance & Soul card Waveforms
 my @RSC3004=qw(
@@ -196,112 +196,127 @@ my @RSC3004=qw(
     31:AnaNoiz2 32:GTRNoiz );
 
 # W7701 / W5501 Sax 1 card Waveforms (4 waves)
-my @W7701=('01:TSaxSoft', '02:TSaxHard', '03:ASaxSoft', '04:ASaxHard');
+my @W7701=(
+    '01:TSaxSoft', '02:TSaxHard', '03:ASaxSoft', '04:ASaxHard');
 
 # W7702 / W5502 Drums 1 card Waveforms (12 waves)
-my @W7702=('01:Kick',   '02:SD 1 Dry', '03:SD 1 Rim', '04:SD 2', '05:SD 3', '06:Tom 1', '07:Tom 2', '08:HH Light',
-           '09:HH Mid', '10:HH Heavy', '11:HH Open',  '12:HH Pedal');
+my @W7702=(
+    '01:Kick',     '02:SD 1 Dry', '03:SD 1 Rim', '04:SD 2',     '05:SD 3',     '06:Tom 1',    '07:Tom 2',    '08:HH Light',
+    '09:HH Mid',   '10:HH Heavy', '11:HH Open',  '12:HH Pedal');
 
 # W7704 / W5504 Brass Section card Waveforms (6 waves)
-my @W7704=('01:Trumpets', '02:Tenors', '03:Baritone', '04:Blast', '05:Roll', '06:Sax Pad');
+my @W7704=(
+    '01:Trumpets', '02:Tenors',   '03:Baritone', '04:Blast',    '05:Roll',     '06:Sax Pad');
 
 # W7705 / W5505 String Section card Waveforms (2 waves)
-my @W7705=('01:Strings', '02:Pizz');
+my @W7705=(
+    '01:Strings',  '02:Pizz');
 
 # W7731 / W5531 Syn Wave 1 card Waveforms (16 waves)
-my @W7731=('01:Syn Brs1', '02:AnlgSaw3', '03:Pan Pipe', '04:NewroStr', '05:Glasphon', '06:TwinBell', '07:Slap E.P', '08:W Steel',
-           '09:MetalSaw', '10:Keen',     '11:Bell Pad', '12:Or.Click', '13:ProcesBD', '14:ProcesSD', '15:ProcesHH', '16:TuttiHit');
+my @W7731=(
+    '01:Syn Brs1', '02:AnlgSaw3', '03:Pan Pipe', '04:NewroStr', '05:Glasphon', '06:TwinBell', '07:Slap E.P', '08:W Steel',
+    '09:MetalSaw', '10:Keen',     '11:Bell Pad', '12:Or.Click', '13:ProcesBD', '14:ProcesSD', '15:ProcesHH', '16:TuttiHit');
 
 # W7732 / W5532 Syn Wave 2 card Waveforms (9 waves)
-my @W7732=('01:AnaBass1', '02:AnaBass2', '03:AnaStr 1', '04:AnaStr 2', '05:AnaStr 3', '06:CS80 Brs', '07:AnaBrs 2', '08:AnaLead', '09:NoiseMix');
+my @W7732=(
+    '01:AnaBass1', '02:AnaBass2', '03:AnaStr 1', '04:AnaStr 2', '05:AnaStr 3', '06:CS80 Brs', '07:AnaBrs 2', '08:AnaLead',
+    '09:NoiseMix');
 
 # W7751 / W5551 Rock & Pop card Waveforms (28 waves)
-my @W7751=('01:Power BD', '02:Tight BD', '03:MediumSD', '04:Light SD', '05:Power SD', '06:PowerTom', '07:Syn Tom',  '08:HHclosed',
-           '09:HH open',  '10:Claps',    '11:Clave',    '12:Belltree', '13:PickBass', '14:SlapBass', '15:SynBass',  '16:Gtr Pluk',
-           '17:Clavi Wv', '18:EP Wave',  '19:SynOrgan', '20:MiniSolo', '21:MiniSaw',  '22:MatrixWv', '23:Quack Wv', '24:Brth Flt',
-           '25:Trumbone', '26:BrassWv1', '27:BrassWv2', '28:Typist');
+my @W7751=(
+    '01:Power BD', '02:Tight BD', '03:MediumSD', '04:Light SD', '05:Power SD', '06:PowerTom', '07:Syn Tom',  '08:HHclosed',
+    '09:HH open',  '10:Claps',    '11:Clave',    '12:Belltree', '13:PickBass', '14:SlapBass', '15:SynBass',  '16:Gtr Pluk',
+    '17:Clavi Wv', '18:EP Wave',  '19:SynOrgan', '20:MiniSolo', '21:MiniSaw',  '22:MatrixWv', '23:Quack Wv', '24:Brth Flt',
+    '25:Trumbone', '26:BrassWv1', '27:BrassWv2', '28:Typist');
 
 # W7752 / W5552 House & Latin card Waveforms (37 waves)
-my @W7752=qw(01:TronixBD 02:RebelBD  03:BoomBD   04:MaddySN  05:SplashSN 06:RimhitSN 07:TrashSN  08:CheapSN  09:AnaCow   10:AnaClap
-             11:AnaTom   12:AnaClave 13:AnaConga 14:AnaHHCL  15:AnaHHOP  16:NoizeHit 17:RockMe!  18:RollMe!  19:Haaaay!  20:Yeeeah!
-             21:Synbass1 22:Synbass2 23:GtrPluck 24:CongaSlp 25:CongaLow 26:CongaHi  27:CongaSl  28:CongaHl  29:CongaDmp 30:Timbale
-             31:Shaker   32:Cabasa   33:Whistle  34:Tambo    35:Agogo    36:Bongo    37:Tabla );
+my @W7752=qw(
+    01:TronixBD 02:RebelBD  03:BoomBD   04:MaddySN  05:SplashSN 06:RimhitSN 07:TrashSN  08:CheapSN  09:AnaCow   10:AnaClap
+    11:AnaTom   12:AnaClave 13:AnaConga 14:AnaHHCL  15:AnaHHOP  16:NoizeHit 17:RockMe!  18:RollMe!  19:Haaaay!  20:Yeeeah!
+    21:Synbass1 22:Synbass2 23:GtrPluck 24:CongaSlp 25:CongaLow 26:CongaHi  27:CongaSl  28:CongaHl  29:CongaDmp 30:Timbale
+    31:Shaker   32:Cabasa   33:Whistle  34:Tambo    35:Agogo    36:Bongo    37:Tabla );
 
 # Internal 512K RAM Waveforms (can contain max. 64 waves)
 my @WaveRAM=(); for (my $nr=1; $nr<=64; $nr++) { $WaveRAM[$nr-1]=(sprintf("%02d",$nr)).':WaveRAM'; }
 
 # RM50 Preset/Variation banks voice names
-my @BD_voices=('01:DR Kikin', '02:DR Hard',  '03:DR Boom',  '04:DR Danc1', '05:DR Danc2', '06:DR Danc3', '07:DR Danc4', '08:DR Jazz1',
-               '09:DR Maple', '10:DR Pop1',  '11:DR Byter', '12:DR LoCal', '13:DR Beef',  '14:DR Clean', '15:DR Click', '16:DR Fuzzy',
-               '17:DR Kinta', '18:DR Punch', '19:DR Round', '20:DR Slap1', '21:DR Slap2', '22:DR Solid', '23:DR Stud1', '24:DR Stud2',
-               '25:DR Thump', '26:DR Woof',  '27:DR Arid',  '28:DR Huge',  '29:DR Live',  '30:JZ Lite',  '31:JZ DbHd1', '32:JZ DbHd2',
-               '33:JZ Loose', '34:JZ Hard',  '35:JZ Swing', '36:JZ Swang', '37:JZ Smith', '38:RM Big',   '39:RM Pow',   '40:RM Boo',
-               '41:RM Def',   '42:RM Lizrd', '43:RM Crnch', '44:RM Piles', '45:RM Open',  '46:RM AirHd', '47:RM Tight', '48:RM Soft',
-               '49:RM Jazz',  '50:RM Nuke',  '51:RM March', '52:RV Bambi', '53:RV Kick',  '54:RV Mondo', '55:RV Balad', '56:RV LoHz',
-               '57:RV Orch',  '58:RV Arena', '59:GT Tyron', '60:GT Mutha', '61:GT Tight', '62:GT Noizy', '63:GT Homer', '64:GT Aero',
-               '65:GT Fist',  '66:GT Stuff', '67:GT Blanc', '68:GT Snack', '69:GT Rattl', '70:GT Klass', '71:GT 5 Bar', '72:GT Grind',
-               '73:AN Antek', '74:AN 919',   '75:AN 929',   '76:AN 939',   '77:AN 818',   '78:AN Sinus', '79:AN Booom', '80:EL Kirk',
-               '81:EL Simm',  '82:EL Paso',  '83:EL Prinz', '84:EL Rap',   '85:EL Efant', '86:EL Ectro', '87:EL Ouise', '88:EL Ektrn',
-               '89:EL Sid',   '90:EL Tech1', '91:EL Tech2', '92:FX Klam',  '93:FX Klang', '94:FX Hell',  '95:FX IYF',   '96:FX Trash',
-               '97:FX Zilla', '98:FX Atom',  '99:FX Futur', '100:FX TNT',  '101:FX Cicad', '102:FX Delay');
+my @BD_voices=(
+    '01:DR Kikin', '02:DR Hard',  '03:DR Boom',  '04:DR Danc1', '05:DR Danc2', '06:DR Danc3', '07:DR Danc4', '08:DR Jazz1',
+    '09:DR Maple', '10:DR Pop1',  '11:DR Byter', '12:DR LoCal', '13:DR Beef',  '14:DR Clean', '15:DR Click', '16:DR Fuzzy',
+    '17:DR Kinta', '18:DR Punch', '19:DR Round', '20:DR Slap1', '21:DR Slap2', '22:DR Solid', '23:DR Stud1', '24:DR Stud2',
+    '25:DR Thump', '26:DR Woof',  '27:DR Arid',  '28:DR Huge',  '29:DR Live',  '30:JZ Lite',  '31:JZ DbHd1', '32:JZ DbHd2',
+    '33:JZ Loose', '34:JZ Hard',  '35:JZ Swing', '36:JZ Swang', '37:JZ Smith', '38:RM Big',   '39:RM Pow',   '40:RM Boo',
+    '41:RM Def',   '42:RM Lizrd', '43:RM Crnch', '44:RM Piles', '45:RM Open',  '46:RM AirHd', '47:RM Tight', '48:RM Soft',
+    '49:RM Jazz',  '50:RM Nuke',  '51:RM March', '52:RV Bambi', '53:RV Kick',  '54:RV Mondo', '55:RV Balad', '56:RV LoHz',
+    '57:RV Orch',  '58:RV Arena', '59:GT Tyron', '60:GT Mutha', '61:GT Tight', '62:GT Noizy', '63:GT Homer', '64:GT Aero',
+    '65:GT Fist',  '66:GT Stuff', '67:GT Blanc', '68:GT Snack', '69:GT Rattl', '70:GT Klass', '71:GT 5 Bar', '72:GT Grind',
+    '73:AN Antek', '74:AN 919',   '75:AN 929',   '76:AN 939',   '77:AN 818',   '78:AN Sinus', '79:AN Booom', '80:EL Kirk',
+    '81:EL Simm',  '82:EL Paso',  '83:EL Prinz', '84:EL Rap',   '85:EL Efant', '86:EL Ectro', '87:EL Ouise', '88:EL Ektrn',
+    '89:EL Sid',   '90:EL Tech1', '91:EL Tech2', '92:FX Klam',  '93:FX Klang', '94:FX Hell',  '95:FX IYF',   '96:FX Trash',
+    '97:FX Zilla', '98:FX Atom',  '99:FX Futur', '100:FX TNT',  '101:FX Cicad', '102:FX Delay');
 
-my @SD_voices=('01:DR HiPop', '02:DR Digit', '03:DR Rim1',  '04:DR Damn',  '05:DR Custr', '06:DR Basic', '07:DR Kindl', '08:DR Smack',
-               '09:DR M.O.R', '10:DR Metl1', '11:DR Brass', '12:DR Steel', '13:DR Rim2',  '14:DR Tite1', '15:DR Tite2', '16:DR Maple',
-               '17:DR Real1', '18:DR Norm',  '19:DR 400',   '20:DR Marly', '21:DR Danc1', '22:DR Danc2', '23:DR Danc3', '24:DR Arid1',
-               '25:DR Arid2', '26:DR Arid3', '27:DR Arid4', '28:DR Rim3',  '29:DR Rim4',  '30:DR Vergn', '31:DR Wood',  '32:DR Real2',
-               '33:DR Krack', '34:JZ Playr', '35:JZ Cool',  '36:JZ Brsa1', '37:JZ Swpa1', '38:JZ Brsb1', '39:JZ Swpb1', '40:JZ Swsh1',
-               '41:JZ Brsa2', '42:JZ Swpa2', '43:JZ Brsb2', '44:JZ Swpb2', '45:JZ Swsh2', '46:RM Burnn', '47:RM Crank', '48:RM Karim',
-               '49:RM Obese', '50:RM Diet',  '51:RM Tubby', '52:RM No FC', '53:RM 9volt', '54:RV Gospl', '55:RV TheDB', '56:RV Spike',
-               '57:RV Atom',  '58:RV Sizzl', '59:RV Head',  '60:RV Biznz', '61:RV Wham',  '62:RV Bam',   '63:RV Thanx', '64:RV Canon',
-               '65:RV Bryte', '66:RV Ghost', '67:RV IYF',   '68:GT Shock', '69:GT HiFab', '70:GT Short', '71:GT LoFab', '72:GT Sucks',
-               '73:GT Thump', '74:GT EatIt', '75:GT Whip',  '76:GT Tasty', '77:GT Anvil', '78:GT Stape', '79:GT Erake', '80:GT Fable',
-               '81:GT Wacko', '82:AN Orexk', '83:AN 919',   '84:AN 818',   '85:AN 929',   '86:AN 828',   '87:EL Down',  '88:EL Power',
-               '89:EL Simm',  '90:FX Tech',  '91:FX 9Roll', '92:FX Ugly',  '93:FX Pain',  '94:FX Undys', '95:FX Igor',  '96:FX Spit',
-               '97:FX Sneez', '98:FX Cough', '99:FX Bakup', '100:FX Ruff', '101:FX Jam',  '102:FX Spew', '103:FX Hack', '104:SS Ambi1',
-               '105:SS Ambi2', '106:SS Dryer', '107:SS Dry', '108:SS Count');
+my @SD_voices=(
+    '01:DR HiPop', '02:DR Digit', '03:DR Rim1',  '04:DR Damn',  '05:DR Custr', '06:DR Basic', '07:DR Kindl', '08:DR Smack',
+    '09:DR M.O.R', '10:DR Metl1', '11:DR Brass', '12:DR Steel', '13:DR Rim2',  '14:DR Tite1', '15:DR Tite2', '16:DR Maple',
+    '17:DR Real1', '18:DR Norm',  '19:DR 400',   '20:DR Marly', '21:DR Danc1', '22:DR Danc2', '23:DR Danc3', '24:DR Arid1',
+    '25:DR Arid2', '26:DR Arid3', '27:DR Arid4', '28:DR Rim3',  '29:DR Rim4',  '30:DR Vergn', '31:DR Wood',  '32:DR Real2',
+    '33:DR Krack', '34:JZ Playr', '35:JZ Cool',  '36:JZ Brsa1', '37:JZ Swpa1', '38:JZ Brsb1', '39:JZ Swpb1', '40:JZ Swsh1',
+    '41:JZ Brsa2', '42:JZ Swpa2', '43:JZ Brsb2', '44:JZ Swpb2', '45:JZ Swsh2', '46:RM Burnn', '47:RM Crank', '48:RM Karim',
+    '49:RM Obese', '50:RM Diet',  '51:RM Tubby', '52:RM No FC', '53:RM 9volt', '54:RV Gospl', '55:RV TheDB', '56:RV Spike',
+    '57:RV Atom',  '58:RV Sizzl', '59:RV Head',  '60:RV Biznz', '61:RV Wham',  '62:RV Bam',   '63:RV Thanx', '64:RV Canon',
+    '65:RV Bryte', '66:RV Ghost', '67:RV IYF',   '68:GT Shock', '69:GT HiFab', '70:GT Short', '71:GT LoFab', '72:GT Sucks',
+    '73:GT Thump', '74:GT EatIt', '75:GT Whip',  '76:GT Tasty', '77:GT Anvil', '78:GT Stape', '79:GT Erake', '80:GT Fable',
+    '81:GT Wacko', '82:AN Orexk', '83:AN 919',   '84:AN 818',   '85:AN 929',   '86:AN 828',   '87:EL Down',  '88:EL Power',
+    '89:EL Simm',  '90:FX Tech',  '91:FX 9Roll', '92:FX Ugly',  '93:FX Pain',  '94:FX Undys', '95:FX Igor',  '96:FX Spit',
+    '97:FX Sneez', '98:FX Cough', '99:FX Bakup', '100:FX Ruff', '101:FX Jam',  '102:FX Spew', '103:FX Hack', '104:SS Ambi1',
+    '105:SS Ambi2', '106:SS Dryer', '107:SS Dry', '108:SS Count');
 
-my @TM_voices=('01:DR Nice1', '02:DR Nice2', '03:DR Nice3', '04:DR Nice4', '05:DR Slap1', '06:DR Slap2', '07:DR Slap3', '08:DR Slap4',
-               '09:DR Mapl1', '10:DR Mapl2', '11:DR Mapl3', '12:DR Mapl4', '13:DR Powr1', '14:DR Powr2', '15:DR Powr3', '16:DR Powr4',
-               '17:DR Danc1', '18:DR Danc2', '19:DR Danc3', '20:DR Danc4', '21:DR Jazz1', '22:DR Jazz2', '23:DR Jazz3', '24:DR Jazz4',
-               '25:RM Bop1',  '26:RM Bop2',  '27:RM Bop3',  '28:RM Bop4',  '29:RM Metl1', '30:RM Metl2', '31:RM Metl3', '32:RM Metl4',
-               '33:RM Metl5', '34:RM Metl6', '35:RM Klip1', '36:RM Klip2', '37:RM Klip3', '38:RM Klip4', '39:RM Wet1',  '40:RM Wet2',
-               '41:RM Wet3',  '42:RM Wet4',  '43:RM Hard1', '44:RM Hard2', '45:RM Hard3', '46:RM Hard4', '47:RV Atom1', '48:RV Atom2',
-               '49:RV Atom3', '50:RV Atom4', '51:RV Huge1', '52:RV Huge2', '53:RV Huge3', '54:RV Huge4', '55:RV Stik1', '56:RV Stik2',
-               '57:RV Stik3', '58:RV Stik4', '59:RV Stad1', '60:RV Stad2', '61:RV Stad3', '62:RV Stad4', '63:RV Ambi1', '64:RV Ambi2',
-               '65:RV Ambi3', '66:RV Ambi4', '67:GT Tite1', '68:GT Tite2', '69:GT Tite3', '70:GT Tite4', '71:AN Sine1', '72:AN Sine2',
-               '73:AN Sine3', '74:AN Sine4', '75:EL Simm1', '76:EL Simm2', '77:EL Simm3', '78:EL Simm4', '79:EL Phew1', '80:EL Phew2',
-               '81:EL Phew3', '82:EL Phew4', '83:FX Hurt1', '84:FX Hurt2', '85:FX Hurt3', '86:FX Hurt4', '87:FX Cyn1',  '88:FX Cyn2',
-               '89:FX Cyn3',  '90:FX Cyn4',  '91:ET Buru1', '92:ET Buru2', '93:ET Buru3', '94:ET BStik', '95:FX Wack1', '96:FX Wack2',
-               '97:FX Wack3', '98:FX Wack4', '99:FX Rvrs1', '100:FX Rvrs2', '101:FX Rvrs3', '102:FX Rvrs4', '103:FX Flng1', '104:FX Flng2',
-               '105:FX Flng3', '106:FX Flng4', '107:FX Solo');
+my @TM_voices=(
+    '01:DR Nice1', '02:DR Nice2', '03:DR Nice3', '04:DR Nice4', '05:DR Slap1', '06:DR Slap2', '07:DR Slap3', '08:DR Slap4',
+    '09:DR Mapl1', '10:DR Mapl2', '11:DR Mapl3', '12:DR Mapl4', '13:DR Powr1', '14:DR Powr2', '15:DR Powr3', '16:DR Powr4',
+    '17:DR Danc1', '18:DR Danc2', '19:DR Danc3', '20:DR Danc4', '21:DR Jazz1', '22:DR Jazz2', '23:DR Jazz3', '24:DR Jazz4',
+    '25:RM Bop1',  '26:RM Bop2',  '27:RM Bop3',  '28:RM Bop4',  '29:RM Metl1', '30:RM Metl2', '31:RM Metl3', '32:RM Metl4',
+    '33:RM Metl5', '34:RM Metl6', '35:RM Klip1', '36:RM Klip2', '37:RM Klip3', '38:RM Klip4', '39:RM Wet1',  '40:RM Wet2',
+    '41:RM Wet3',  '42:RM Wet4',  '43:RM Hard1', '44:RM Hard2', '45:RM Hard3', '46:RM Hard4', '47:RV Atom1', '48:RV Atom2',
+    '49:RV Atom3', '50:RV Atom4', '51:RV Huge1', '52:RV Huge2', '53:RV Huge3', '54:RV Huge4', '55:RV Stik1', '56:RV Stik2',
+    '57:RV Stik3', '58:RV Stik4', '59:RV Stad1', '60:RV Stad2', '61:RV Stad3', '62:RV Stad4', '63:RV Ambi1', '64:RV Ambi2',
+    '65:RV Ambi3', '66:RV Ambi4', '67:GT Tite1', '68:GT Tite2', '69:GT Tite3', '70:GT Tite4', '71:AN Sine1', '72:AN Sine2',
+    '73:AN Sine3', '74:AN Sine4', '75:EL Simm1', '76:EL Simm2', '77:EL Simm3', '78:EL Simm4', '79:EL Phew1', '80:EL Phew2',
+    '81:EL Phew3', '82:EL Phew4', '83:FX Hurt1', '84:FX Hurt2', '85:FX Hurt3', '86:FX Hurt4', '87:FX Cyn1',  '88:FX Cyn2',
+    '89:FX Cyn3',  '90:FX Cyn4',  '91:ET Buru1', '92:ET Buru2', '93:ET Buru3', '94:ET BStik', '95:FX Wack1', '96:FX Wack2',
+    '97:FX Wack3', '98:FX Wack4', '99:FX Rvrs1', '100:FX Rvrs2', '101:FX Rvrs3', '102:FX Rvrs4', '103:FX Flng1', '104:FX Flng2',
+    '105:FX Flng3', '106:FX Flng4', '107:FX Solo');
 
-my @CY_voices=('01:HH RYCl1', '02:HH RYQt1', '03:HH RYHf1', '04:HH RYOp1', '05:HH RYPd1', '06:HH RYCl2', '07:HH RYOp2', '08:HH RkClR',
-               '09:HH RkkCl', '10:HH RkQrt', '11:HH RkHlf', '12:HH RkOpn', '13:HH RkPed', '14:HH AmCls', '15:HH AmOpn', '16:HH AmPed',
-               '17:HH VxCls', '18:HH VxOpn', '19:HH TecC1', '20:HH TecC2', '21:HH TecC3', '22:HH TecO1', '23:HH TecO2', '24:HH Pitch',
-               '25:HH Stand', '26:HH AnCl1', '27:HH AnOp1', '28:HH AnCl2', '29:HH AnOp2', '30:RD Medi1', '31:RD EdgCp', '32:RD Bell',
-               '33:RD Flat',  '34:RD Rock',  '35:RD RckBl', '36:RD Jazz1', '37:RD Jazz2', '38:RD Long',  '39:RD Medi2', '40:RD Sizzl',
-               '41:RD FxBel', '42:RD FxRid', '43:CR Crsh1', '44:CR Crsh2', '45:CR Dark1', '46:CR High1', '47:CR Dark2', '48:CR High2',
-               '49:CR Rock1', '50:CR Rock2', '51:CR Choke', '52:CS Spls1', '53:CS Spls2', '54:CS Spls3', '55:CH Chin1', '56:CH Ride',
-               '57:CH Short', '58:CH Chin2', '59:CH Gong',  '60:CH Strok', '61:FX Big1',  '62:FX Gong',  '63:FX Elekt', '64:FX Revrs',
-               '65:FX Tecko');
+my @CY_voices=(
+    '01:HH RYCl1', '02:HH RYQt1', '03:HH RYHf1', '04:HH RYOp1', '05:HH RYPd1', '06:HH RYCl2', '07:HH RYOp2', '08:HH RkClR',
+    '09:HH RkkCl', '10:HH RkQrt', '11:HH RkHlf', '12:HH RkOpn', '13:HH RkPed', '14:HH AmCls', '15:HH AmOpn', '16:HH AmPed',
+    '17:HH VxCls', '18:HH VxOpn', '19:HH TecC1', '20:HH TecC2', '21:HH TecC3', '22:HH TecO1', '23:HH TecO2', '24:HH Pitch',
+    '25:HH Stand', '26:HH AnCl1', '27:HH AnOp1', '28:HH AnCl2', '29:HH AnOp2', '30:RD Medi1', '31:RD EdgCp', '32:RD Bell',
+    '33:RD Flat',  '34:RD Rock',  '35:RD RckBl', '36:RD Jazz1', '37:RD Jazz2', '38:RD Long',  '39:RD Medi2', '40:RD Sizzl',
+    '41:RD FxBel', '42:RD FxRid', '43:CR Crsh1', '44:CR Crsh2', '45:CR Dark1', '46:CR High1', '47:CR Dark2', '48:CR High2',
+    '49:CR Rock1', '50:CR Rock2', '51:CR Choke', '52:CS Spls1', '53:CS Spls2', '54:CS Spls3', '55:CH Chin1', '56:CH Ride',
+    '57:CH Short', '58:CH Chin2', '59:CH Gong',  '60:CH Strok', '61:FX Big1',  '62:FX Gong',  '63:FX Elekt', '64:FX Revrs',
+    '65:FX Tecko');
 
-my @PC_voices=('01:LP AgoHi', '02:LP AgoLo', '03:LP BngHi', '04:LP BngLo', '05:LP Caba1', '06:LP Caba2', '07:LP Caba3', '08:LP Caba4',
-               '09:LP Clave', '10:LP Qnto1', '11:LP Cong1', '12:LP Tumb1', '13:LP Slap1', '14:LP Low1',  '15:LP Mute1', '16:LP Heel1',
-               '17:LP CgHi2', '18:LP CgLo2', '19:LP Slap2', '20:LP Mute2', '21:LP Heel2', '22:LP Cow1',  '23:LP Cow2',  '24:LP Cow3',
-               '25:LP Guiro', '26:LP Shak1', '27:LP Shak2', '28:LP Tamb1', '29:LP Tamb2', '30:LP Tamb3', '31:LP Tmpl1', '32:LP Tmpl2',
-               '33:LP Tmpl3', '34:LP Tmpl4', '35:LP TimH1', '36:LP TimL1', '37:LP TimH2', '38:LP TimL2', '39:LP Casc1', '40:LP Casc2',
-               '41:LP Trian', '42:LP Whist', '43:PC Log1',  '44:PC Log2',  '45:PC Log3',  '46:PC Log4',  '47:PC Talk1', '48:PC Talk2',
-               '49:PC Yoru1', '50:PC Yoru2', '51:PC Yoru3', '52:PC Yoru4', '53:PC Bott1', '54:PC Bott2', '55:PC Bott3', '56:PC Bott4',
-               '57:PC Clap1', '58:PC Clap2', '59:PC AnaMu', '60:PC Snap',  '61:PC MeloB', '62:PC Metal', '63:PC PopM1', '64:PC PopM2',
-               '65:PC PopM3', '66:PC PopM4', '67:PC TekD');
+my @PC_voices=(
+    '01:LP AgoHi', '02:LP AgoLo', '03:LP BngHi', '04:LP BngLo', '05:LP Caba1', '06:LP Caba2', '07:LP Caba3', '08:LP Caba4',
+    '09:LP Clave', '10:LP Qnto1', '11:LP Cong1', '12:LP Tumb1', '13:LP Slap1', '14:LP Low1',  '15:LP Mute1', '16:LP Heel1',
+    '17:LP CgHi2', '18:LP CgLo2', '19:LP Slap2', '20:LP Mute2', '21:LP Heel2', '22:LP Cow1',  '23:LP Cow2',  '24:LP Cow3',
+    '25:LP Guiro', '26:LP Shak1', '27:LP Shak2', '28:LP Tamb1', '29:LP Tamb2', '30:LP Tamb3', '31:LP Tmpl1', '32:LP Tmpl2',
+    '33:LP Tmpl3', '34:LP Tmpl4', '35:LP TimH1', '36:LP TimL1', '37:LP TimH2', '38:LP TimL2', '39:LP Casc1', '40:LP Casc2',
+    '41:LP Trian', '42:LP Whist', '43:PC Log1',  '44:PC Log2',  '45:PC Log3',  '46:PC Log4',  '47:PC Talk1', '48:PC Talk2',
+    '49:PC Yoru1', '50:PC Yoru2', '51:PC Yoru3', '52:PC Yoru4', '53:PC Bott1', '54:PC Bott2', '55:PC Bott3', '56:PC Bott4',
+    '57:PC Clap1', '58:PC Clap2', '59:PC AnaMu', '60:PC Snap',  '61:PC MeloB', '62:PC Metal', '63:PC PopM1', '64:PC PopM2',
+    '65:PC PopM3', '66:PC PopM4', '67:PC TekD');
 
-my @SE_voices=('01:FX 7-11',  '02:FX B-Ben', '03:FX Joker', '04:FX Tubey', '05:FX Daiko', '06:FX Mello', '07:FX Door',  '08:FX Zero',
-               '09:FX Blip',  '10:FX Bubbl', '11:FX Canes', '12:FX OilDr', '13:FX Sheet', '14:FX Sword', '15:FX Stab',  '16:FX Gongy',
-               '17:FX Robot', '18:FX R2D2',  '19:FX RvCrs', '20:FX Scene', '21:FX Scrat', '22:FX Shui',  '23:FX Snark', '24:FX Spark',
-               '25:FX Alien', '26:FX Steps', '27:FX Stix',  '28:FX Wiggy', '29:FX Falic', '30:FX Afro',  '31:FX Blow',  '32:FX Log',
-               '33:FX Metal', '34:FX Pip',   '35:FX Revrs', '36:FX Rezzo', '37:FX Wet',   '38:FX BDMth', '39:FX S1Mth', '40:FX S2Mth',
-               '41:FX S3Mth', '42:FX CYMth', '43:FX HCMth', '44:FX HOMth', '45:FX Type',  '46:FX Heart', '47:FX Tape',  '48:BA Nasti',
-               '49:BA KillB', '50:BA Softa', '51:BA 30');
+my @SE_voices=(
+    '01:FX 7-11',  '02:FX B-Ben', '03:FX Joker', '04:FX Tubey', '05:FX Daiko', '06:FX Mello', '07:FX Door',  '08:FX Zero',
+    '09:FX Blip',  '10:FX Bubbl', '11:FX Canes', '12:FX OilDr', '13:FX Sheet', '14:FX Sword', '15:FX Stab',  '16:FX Gongy',
+    '17:FX Robot', '18:FX R2D2',  '19:FX RvCrs', '20:FX Scene', '21:FX Scrat', '22:FX Shui',  '23:FX Snark', '24:FX Spark',
+    '25:FX Alien', '26:FX Steps', '27:FX Stix',  '28:FX Wiggy', '29:FX Falic', '30:FX Afro',  '31:FX Blow',  '32:FX Log',
+    '33:FX Metal', '34:FX Pip',   '35:FX Revrs', '36:FX Rezzo', '37:FX Wet',   '38:FX BDMth', '39:FX S1Mth', '40:FX S2Mth',
+    '41:FX S3Mth', '42:FX CYMth', '43:FX HCMth', '44:FX HOMth', '45:FX Type',  '46:FX Heart', '47:FX Tape',  '48:BA Nasti',
+    '49:BA KillB', '50:BA Softa', '51:BA 30');
 
 my @IMX_voices=(); for (my $nr=1; $nr<=128; $nr++) { $IMX_voices[$nr-1]=(sprintf("%02d",$nr)).':UserVoice'; }
 
