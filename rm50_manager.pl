@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 #
-# Yamaha RM50 Manager version 0.2
+#  Yamaha RM50 Manager version 0.2
 #
-# (C) 2012 LinuxTECH.NET
+#  Copyright (C) 2012 LinuxTECH.NET
 #
 #  Yamaha is a registered trademark of Yamaha Corporation.
 #
@@ -74,7 +74,6 @@ my %Scale_defaults=(
     -borderwidth  => 1,
     -showvalue    => 0,
     -resolution   => 1,
-#   -command      => \&Callbk, 
     -font         => "Sans $f1",
     -cursor       => 'hand2',
     -orient       => 'horizontal'
