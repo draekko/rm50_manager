@@ -433,7 +433,7 @@ my %wavehash=( 'Preset'  => \@waves,   'IntRAM'  => \@WaveRAM,
 # Each Waveform card has a unique ID
 my %waveid=(
     'RSC3001' => '', 'RSC3002' => '', 'RSC3003' => '', 'RSC3004' => '',
-    'RSC3071' => 17, 'RSC3072' => '', 'RSC3073' => '', 'RSC3074' => 20,
+    'RSC3071' => 17, 'RSC3072' => 18, 'RSC3073' => 19, 'RSC3074' => 20,
     'W7701'   =>  3, 'W7702'   =>  2, 'W7704'   =>  7, 'W7705'   => '',
     'W7731'   =>  6, 'W7732'   => '', 'W7751'   =>  4, 'W7752'   => '' );
 
