@@ -24,7 +24,7 @@ use warnings;
 my $version="0.2";
 
 use Tk;
-#use Tk::Pane;
+use Tk::Pane;
 use Tk::NoteBook;
 #use Tk::Balloon;
 use Tk::BrowseEntry;
@@ -93,12 +93,8 @@ my %Frame_defaults=(
 );
 my %BEntry_defaults=(
     -state        => 'readonly',
-    -borderwidth  => 1,
     -font         => 'Sans 8',
     -style        => 'MSWin32',
-    -highlightthickness => 0,
-    -disabledforeground => 'black',
-    -disabledbackground => $LCDbg
 );
 my %choices_defaults=(
     -borderwidth  => 1,
@@ -107,7 +103,6 @@ my %choices_defaults=(
     -pady         => 1
 );
 my %arrow_defaults=(
-    -borderwidth  => 1, 
     -width        => 13,
     -height       => 12,
     -bitmap       => 'darrow'
@@ -337,17 +332,17 @@ my @RSC3002_voices=(
 
 # RSC3003 House & Rap card voice names
 my @RSC3003_voices=qw(
-    01:  02:  03:  04:  05:  06:  07:  08:  09:  10:
-    11:  12:  13:  14:  15:  16:  17:  18:  19:  20:
-    21:  22:  23:  24:  25:  26:  27:  28:  29:  30:
-    31:  32: );
+    01:  02:  03:  04:  05:  06:  07:  08:
+    09:  10:  11:  12:  13:  14:  15:  16:
+    17:  18:  19:  20:  21:  22:  23:  24:
+    25:  26:  27:  28:  29:  30:  31:  32: );
 
 # RSC3004 Dance & Soul card voice names
 my @RSC3004_voices=qw(
-    01:  02:  03:  04:  05:  06:  07:  08:  09:  10:
-    11:  12:  13:  14:  15:  16:  17:  18:  19:  20:
-    21:  22:  23:  24:  25:  26:  27:  28:  29:  30:
-    31:  32: );
+    01:  02:  03:  04:  05:  06:  07:  08:
+    09:  10:  11:  12:  13:  14:  15:  16:
+    17:  18:  19:  20:  21:  22:  23:  24:
+    25:  26:  27:  28:  29:  30:  31:  32: );
 
 # RSC3071 Dave Weckl card voice names
 my @RSC3071_voices=(
@@ -447,6 +442,16 @@ my $data_card=$datacards[0];
 # Initial waveform sources
 my @wsources=('Preset', 'IntRAM');
 
+# array mapping MIDI note numbers 35-83 to notes B0-B4
+my @note;
+my @keys=('C ', 'C#', 'D ', 'D#', 'E ', 'F ', 'F#', 'G ', 'G#', 'A ', 'A#', 'B ');
+$note[35]='B 0';
+for (my $nnr=1; $nnr<=4; $nnr++) {
+    for (my $ky=1; $ky<=12; $ky++) {
+        push (@note, $keys[$ky-1].$nnr);
+    }
+}
+
 # selected and available midi in/out devices
 my $midi_outdev="";
 my $midi_outdev_prev="";
@@ -481,6 +486,30 @@ my $darrow_bits=pack("b11"x10,
     "....111....",
     ".....1.....",
     "...........");
+
+# rhythm kit data variables
+my $rywin;
+my $kit_name;
+my $ry_pbrange;
+my @ry_trnote;
+my @ry_bank_sel;
+my @ry_bank;
+my @ry_voice_sel;
+my @ry_voice;
+my @ry_att;
+my @ry_mod;
+my @ry_bal;
+my @ry_flt;
+my @ry_pan;
+my @ry_dcy;
+my @ry_vol;
+my @ry_pbd;
+my @ry_kyo;
+# default Rhythm Kit number (1-64)
+my $dest_rynr=1;
+
+# initialise rhythm kit data variables with default values
+NewRyKit();
 
 # define voice data variables
 my $voice_name;            my $volume;
@@ -533,7 +562,7 @@ newFile();
 
 # set up main program window
 my $mw=MainWindow->new();
-$mw->title("RM50 Rhythm Sound Module Manager - Voice Editor");
+$mw->title("RM50 Manager - Voice Editor");
 $mw->resizable(0,0);
 
 $mw->fontCreate('title', -family=>'Sans', -weight=>'bold', -size=>9);
@@ -558,12 +587,15 @@ $mw->optionAdd('*Listbox.Height', 10, 99);
 # set default entry properties
 $mw->optionAdd('*Entry.borderWidth', 1, 99);
 $mw->optionAdd('*Entry.highlightThickness', 0, 99);
+$mw->optionAdd('*Entry.disabledForeground','black',99);
+$mw->optionAdd('*Entry.disabledBackground', $LCDbg,99);
 # set default scrollbar properties
 $mw->optionAdd('*Scrollbar.borderWidth', 1, 99);
 $mw->optionAdd('*Scrollbar.highlightThickness', 0, 99);
 if ($LINUX) {$mw->optionAdd('*Scrollbar.Width', 10, 99);}
 # set default button properties
 $mw->optionAdd('*Button.borderWidth', 1, 99);
+$mw->optionAdd('*Checkbutton.borderWidth', 1, 99);
 # set default canvas properties
 $mw->optionAdd('*Canvas.highlightThickness', 0, 99);
 
@@ -636,7 +668,10 @@ sub topMenubar {
     
 
     my $btn1=$mf1->Menubutton(-text=>'Edit', -underline=>0, -tearoff=>0, -anchor=>'w',
-       -menuitems => [['command'=>'Save Settings', -command=>\&SaveSettings ]]
+       -menuitems => [['command'=>'Rhythm Kit Editor...', -command=>sub{ if (! Exists($rywin)) { KitEditWin(); }
+                                                                         else { $rywin->deiconify(); $rywin->raise(); } } ],
+                      "-",
+                      ['command'=>'Save Settings',        -command=>\&SaveSettings ]]
     )->pack(-side=>"left");
 
     my $btn2=$mf1->Menubutton(-text=>'Help', -underline=>0, -tearoff=>0, -anchor=>'w',
@@ -1221,6 +1256,10 @@ sub SendPaChMsg {
     SendGenPaChMsg(3, 6, ($dest_vnr-1), $_[0], $_[1], $_[2], $_[3]);
 }
 
+sub SendRyChMsg {
+    SendGenPaChMsg(2, 1, ($dest_rynr-1), $_[0], $_[1], $_[2], $_[3]);
+}
+
 # send generic parameter change message (real time sysex) to RM50
 sub SendGenPaChMsg {
     my $pgroup=chr($_[0]);
@@ -1449,6 +1488,240 @@ sub RcvSnglVceDmp {
             Error("Error: $result");
             return 1;
         }
+}
+
+# initialise rhythm kit
+sub NewRyKit {
+    for (my $a=1; $a<=49; $a++) {
+        my $end;
+        if ($a<=24) { $end=1; } else { $end=0; }
+        for (my $v=0; $v<=$end; $v++) {
+            $ry_bank[$a][$v]='P-BD';
+            $ry_voice[$a][$v]=${$voiceshash{$ry_bank[$a][$v]}}[0];
+            $ry_att[$a][$v]='0';
+        }
+        $ry_mod[$a]='0';
+        $ry_bal[$a]='0';
+        $ry_flt[$a]='0';
+        $ry_pan[$a]='0';
+        $ry_dcy[$a]='0';
+        $ry_vol[$a]='0';
+        $ry_pbd[$a]='0';
+        $ry_kyo[$a]='0';
+    }
+}
+
+# Refresh a rhythm kit editor voices pulldown list
+sub RefreshVceList {
+    my $a=$_[0];
+    my $v=$_[1];
+    my $reset=$_[2];
+    $ry_voice_sel[$a][$v]->delete( 0, "end" );
+    $ry_voice_sel[$a][$v]->insert("end", $_) for (@{$voiceshash{$ry_bank[$a][$v]}});
+    if ($reset) { $ry_voice[$a][$v]=${$voiceshash{$ry_bank[$a][$v]}}[0]; }
+}
+
+# Refresh a rhythm kit editor banks pulldown list
+sub RefreshBnkList {
+    my $a=$_[0];
+    my $v=$_[1];
+    $ry_bank_sel[$a][$v]->delete( 0, "end" );
+    $ry_bank_sel[$a][$v]->insert("end", $_) for (@banks_array);
+}
+
+#-------------------------------------------------------------------------------------------------------------------------
+# Rhythm Kit Editor Window
+
+sub KitEditWin {
+
+    $rywin=$mw->Toplevel();
+    $rywin->resizable(0,1);
+    $rywin->minsize(480,480);
+    $rywin->title('RM50 Manager - Rhythm Kit Editor');
+
+    my $mb=$rywin->Frame(-borderwidth=>1, -relief=>'raised'
+    )->pack(-anchor=>'n', -fill=>'x');
+
+    $mb->Menubutton(-text=>'File', -underline=>0, -tearoff=>0, -anchor=>'w',
+       -menuitems => [['command'=>'New',        -accelerator=>'Ctrl+N',  -command=>sub{ NewRyKit(); } ],
+                      ['command'=>'Open...',    -accelerator=>'Ctrl+O',  -command=>\&loadKit   ],
+                      "-",
+                      ['command'=>'Save',       -accelerator=>'Ctrl+S',  -command=>\&saveKit   ],
+                      ['command'=>'Save As...', -accelerator=>'Ctrl+A',  -command=>\&saveasKit ],
+                      "-",
+                      ['command'=>'Close',       -accelerator=>'Ctrl+C',  -command=>[$rywin=>'destroy'] ]]
+    )->pack(-side=>"left");
+
+    my $tb=$rywin->Frame(
+    )->pack(-anchor=>'n', -fill=>'x');
+
+    $tb->Label(-text=>' Kit Name: ', -font=>'Sans 10', -pady=>4
+    )->pack(-side=>"left");
+    $tb->Entry(%Entry_defaults,
+        -width              => 10,
+        -font               => 'Fixed 10',
+        -validate           => 'key',
+        -validatecommand    => sub {$_[0]=~/^[\x20-\x7F]{0,10}$/},
+        -invalidcommand     => sub {},
+        -textvariable       => \$kit_name
+    )->pack(-side=>"left");
+
+    $tb->Label(
+        -text               => "Kit Nr:",
+        -font               => 'Sans 9',
+        -pady               => 4
+    )->pack(-side=>"left");
+    $tb->Spinbox(%Entry_defaults,
+        -width              => 3,
+        -font               => 'Sans 9',
+        -from               => 1,
+        -to                 => 64,
+        -increment          => 1,
+        -state              => 'readonly',
+        -readonlybackground => $LCDbg,
+        -validate           => 'key',
+        -validatecommand    => sub {(($_[0] eq "") || ($_[0]=~/^[0-9]+$/ && $_[0]>=1 && $_[0]<=64))},
+        -invalidcommand     => sub {},
+        -textvariable       => \$dest_rynr
+    )->pack(-side=>"left");
+
+    $tb->Label(
+        -text               => ' P.B Range:',
+        -font               => 'Sans 9',
+        -pady               => 4
+    )->pack(-side=>"left");
+    $tb->Spinbox(%Entry_defaults,
+        -width              => 3,
+        -font               => 'Sans 9',
+        -from               => 0,
+        -to                 => 12,
+        -increment          => 1,
+        -state              => 'readonly',
+        -readonlybackground => $LCDbg,
+        -validate           => 'key',
+        -validatecommand    => sub {(($_[0] eq "") || ($_[0]=~/^[0-9]+$/ && $_[0]>=0 && $_[0]<=12))},
+        -invalidcommand     => sub {},
+        -textvariable       => \$ry_pbrange
+    )->pack(-side=>"left");
+
+    my @ry_trig;
+    my @notesl=@note[35..83];
+    for (my $tr=1; $tr<=6; $tr++) {
+
+            $tb->Label(
+                -text         => " Trg$tr:",
+                -font         => 'Sans 9'
+            )->pack(-side=>"left");
+
+            $ry_trig[$tr]=$tb->BrowseEntry(%BEntry_defaults,
+                -variable     => \$ry_trnote[$tr],
+                -choices      => \@notesl,
+                -font         => 'Sans 9',
+                -width        => 4
+            )->pack(-side=>"left");
+            $ry_trig[$tr]->Subwidget("choices")->configure(%choices_defaults);
+            $ry_trig[$tr]->Subwidget("arrow")->configure(%arrow_defaults);
+    }
+
+    my $ryw=$rywin->Scrolled('Frame', -scrollbars=>'e', %Frame_defaults
+    )->pack(-anchor=>'n', -fill=>'y', -expand=>1);
+
+    $ryw->Label(%TitleLbl_defaults, -text=>'Note'       )->grid(-row=>0, -column=>0, -sticky=>'ew');
+    $ryw->Label(%TitleLbl_defaults, -text=>'Bank'       )->grid(-row=>0, -column=>1, -sticky=>'ew');
+    $ryw->Label(%TitleLbl_defaults, -text=>'Voice 1'    )->grid(-row=>0, -column=>2, -sticky=>'ew');
+    $ryw->Label(%TitleLbl_defaults, -text=>'Attenuation')->grid(-row=>0, -column=>3, -columnspan=>2, -sticky=>'ew');
+
+    $ryw->Label(%TitleLbl_defaults, -text=>'Bank'       )->grid(-row=>0, -column=>5, -sticky=>'ew');
+    $ryw->Label(%TitleLbl_defaults, -text=>'Voice 2'    )->grid(-row=>0, -column=>6, -sticky=>'ew');
+    $ryw->Label(%TitleLbl_defaults, -text=>'Attenuation')->grid(-row=>0, -column=>7, -columnspan=>2, -sticky=>'ew');
+
+    $ryw->Label(%TitleLbl_defaults, -text=>'Mod'        )->grid(-row=>0, -column=>9, -sticky=>'ew');
+    $ryw->Label(%TitleLbl_defaults, -text=>'Bal'        )->grid(-row=>0, -column=>10, -sticky=>'ew');
+    $ryw->Label(%TitleLbl_defaults, -text=>'Fil'        )->grid(-row=>0, -column=>11, -sticky=>'ew');
+    $ryw->Label(%TitleLbl_defaults, -text=>'Pan'        )->grid(-row=>0, -column=>12, -sticky=>'ew');
+    $ryw->Label(%TitleLbl_defaults, -text=>'Dcy'        )->grid(-row=>0, -column=>13, -sticky=>'ew');
+    $ryw->Label(%TitleLbl_defaults, -text=>'Vol'        )->grid(-row=>0, -column=>14, -sticky=>'ew');
+    $ryw->Label(%TitleLbl_defaults, -text=>'P.B'        )->grid(-row=>0, -column=>15, -sticky=>'ew');
+    $ryw->Label(%TitleLbl_defaults, -text=>'Key'        )->grid(-row=>0, -column=>16, -sticky=>'ew');
+
+    for (my $a=1; $a<=49; $a++) {
+        my $end;
+        if ($a<=24) { $end=1; } else { $end=0; }
+        my $nn=$a;
+        $ryw->Button(
+            -font         => 'title',
+            -textvariable => \$note[$a+34],
+            -command      => sub{ if ($LINUX) { MIDI::ALSA::output(MIDI::ALSA::noteevent(0,$nn+34,127,0,1)); } }
+        )->grid(-row=>$a, -column=>0, -padx=>4, -sticky=>'nsew');
+        for (my $v=0; $v<=$end; $v++) {
+            my $aa=$a; my $vv=$v;
+            # bank selection
+            $ry_bank_sel[$a][$v]=$ryw->BrowseEntry(%BEntry_defaults,
+                -variable     => \$ry_bank[$a][$v],
+                -choices      => [ $ry_bank[$a][$v] ],
+                -font         => 'Sans 9',
+                -width        => 6,
+                -listcmd      => sub{ RefreshBnkList($aa, $vv); },
+                -browsecmd    => sub{ RefreshVceList($aa, $vv, 1); }
+            )->grid(-row=>$a, -column=>1+($v*4), -padx=>4);
+            $ry_bank_sel[$a][$v]->Subwidget("choices")->configure(%choices_defaults);
+            $ry_bank_sel[$a][$v]->Subwidget("arrow")->configure(%arrow_defaults);
+            # voice selection
+            $ry_voice_sel[$a][$v]=$ryw->BrowseEntry(%BEntry_defaults,
+                -variable     => \$ry_voice[$a][$v],
+                -choices      => [ $ry_voice[$a][$v] ],
+                -font         => 'Sans 9',
+                -width        => 12,
+                -listcmd      => sub{ RefreshVceList($aa, $vv, 0); }
+            )->grid(-row=>$a, -column=>2+($v*4), -padx=>4);
+            $ry_voice_sel[$a][$v]->Subwidget("choices")->configure(%choices_defaults);
+            $ry_voice_sel[$a][$v]->Subwidget("arrow")->configure(%arrow_defaults);
+            # Attenuation
+            $ryw->Scale(%Scale_defaults,
+                -variable     => \$ry_att[$a][$v],
+                -to           =>  15,
+                -from         =>   0,
+                -tickinterval =>   3,
+                -length       => 100,
+                -command      => sub{ }
+            )->grid(-row=>$a, -column=>3+($v*4), -padx=>4);
+            $ryw->Label(%Scale_label_defaults,
+                -textvariable => \$ry_att[$a][$v], -width=>2
+            )->grid(-row=>$a, -column=>4+($v*4), -padx=>4);
+        }
+        # Modulation
+        $ryw->Checkbutton(
+            -variable     => \$ry_mod[$a]
+        )->grid(-row=>$a, -column=>9);
+        # Balance
+        $ryw->Checkbutton(
+            -variable     => \$ry_bal[$a]
+        )->grid(-row=>$a, -column=>10);
+        # Filter
+        $ryw->Checkbutton(
+            -variable     => \$ry_flt[$a]
+        )->grid(-row=>$a, -column=>11);
+        # Pan
+        $ryw->Checkbutton(
+            -variable     => \$ry_pan[$a]
+        )->grid(-row=>$a, -column=>12);
+        # Decay
+        $ryw->Checkbutton(
+            -variable     => \$ry_dcy[$a]
+        )->grid(-row=>$a, -column=>13);
+        # Volume
+        $ryw->Checkbutton(
+            -variable     => \$ry_vol[$a]
+        )->grid(-row=>$a, -column=>14);
+        # Pitch bend
+        $ryw->Checkbutton(
+            -variable     => \$ry_pbd[$a]
+        )->grid(-row=>$a, -column=>15);
+        # Key off
+        $ryw->Checkbutton(
+            -variable     => \$ry_kyo[$a]
+        )->grid(-row=>$a, -column=>16);
+    }
 }
 
 #-------------------------------------------------------------------------------------------------------------------------
