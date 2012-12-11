@@ -1243,6 +1243,15 @@ sub SendWvChMsg {
     SendPaChMsg($elm+1,0,(int(($wavnr-1)/128)+$tmp),($wavnr-1)%128);
 }
 
+# send parameter change message to RM50 to update voice and bank numbers of rhythm kits
+sub SendVcChMsg {
+    my $elm=$_[0]; # 1..49
+    my $vnr=$_[1]; # 0,1
+    my $bnk=($bankshash{$ry_bank[$elm][$vnr]})/2;
+    my ($vce)=($ry_voice[$elm][$vnr]=~/^(\d+):.*/);
+    SendRyChMsg($elm,($vnr*10),$bnk,$vce-1);
+}
+
 # only for testing purposes
 sub Callbk {
     print "---\n";
@@ -1694,7 +1703,8 @@ sub KitEditWin {
                 -choices      => [ $ry_voice[$a][$v] ],
                 -font         => 'Sans 9',
                 -width        => 12,
-                -listcmd      => sub{ RefreshVceList($aa, $vv, 0); }
+                -listcmd      => sub{ RefreshVceList($aa, $vv, 0); },
+                -browsecmd    => sub{ SendVcChMsg($aa, $vv); }
             )->grid(-row=>$a, -column=>2+($v*4), -padx=>4);
             $ry_voice_sel[$a][$v]->Subwidget("choices")->configure(%choices_defaults);
             $ry_voice_sel[$a][$v]->Subwidget("arrow")->configure(%arrow_defaults);
@@ -1705,7 +1715,7 @@ sub KitEditWin {
                 -from         =>   0,
                 -tickinterval =>   3,
                 -length       => 100,
-                -command      => sub{ }
+                -command      => sub{ SendRyChMsg($aa,1+($vv*10),0,$ry_att[$aa][$vv]); }
             )->grid(-row=>$a, -column=>3+($v*4), -padx=>4);
             $ryw->Label(%Scale_label_defaults,
                 -textvariable => \$ry_att[$a][$v], -width=>2
