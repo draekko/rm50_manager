@@ -507,6 +507,8 @@ my @ry_pbd;
 my @ry_kyo;
 # default Rhythm Kit number (1-64)
 my $dest_rynr=1;
+# default MIDI channel for playing Rhythm Kit
+my $ry_ch=1;
 
 # initialise rhythm kit data variables with default values
 NewRyKit();
@@ -1539,6 +1541,7 @@ sub KitEditWin {
     $rywin->minsize(480,480);
     $rywin->title('RM50 Manager - Rhythm Kit Editor');
 
+    # Top Menubar
     my $mb=$rywin->Frame(-borderwidth=>1, -relief=>'raised'
     )->pack(-anchor=>'n', -fill=>'x');
 
@@ -1554,8 +1557,28 @@ sub KitEditWin {
 
     my $tb=$rywin->Frame(
     )->pack(-anchor=>'n', -fill=>'x');
+    # MIDI channel
+    $tb->Label(
+        -text               => ' Ch:',
+        -font               => 'Sans 9',
+        -pady               => 4
+    )->pack(-side=>"left");
+    $tb->Spinbox(%Entry_defaults,
+        -width              => 2,
+        -font               => 'Sans 9',
+        -from               => 1,
+        -to                 => 16,
+        -increment          => 1,
+        -state              => 'readonly',
+        -readonlybackground => $LCDbg,
+        -textvariable       => \$ry_ch
+    )->pack(-side=>"left");
 
-    $tb->Label(-text=>' Kit Name: ', -font=>'Sans 10', -pady=>4
+    # Rhythmn Kit Name
+    $tb->Label(
+        -text               => '  Kit Name:',
+        -font               => 'Sans 10',
+        -pady               => 4
     )->pack(-side=>"left");
     $tb->Entry(%Entry_defaults,
         -width              => 10,
@@ -1566,8 +1589,9 @@ sub KitEditWin {
         -textvariable       => \$kit_name
     )->pack(-side=>"left");
 
+    # Rhythmn Kit Number
     $tb->Label(
-        -text               => "Kit Nr:",
+        -text               => ' Kit Nr:',
         -font               => 'Sans 9',
         -pady               => 4
     )->pack(-side=>"left");
@@ -1579,12 +1603,10 @@ sub KitEditWin {
         -increment          => 1,
         -state              => 'readonly',
         -readonlybackground => $LCDbg,
-        -validate           => 'key',
-        -validatecommand    => sub {(($_[0] eq "") || ($_[0]=~/^[0-9]+$/ && $_[0]>=1 && $_[0]<=64))},
-        -invalidcommand     => sub {},
         -textvariable       => \$dest_rynr
     )->pack(-side=>"left");
 
+    # Pitch Bend Range
     $tb->Label(
         -text               => ' P.B Range:',
         -font               => 'Sans 9',
@@ -1598,26 +1620,26 @@ sub KitEditWin {
         -increment          => 1,
         -state              => 'readonly',
         -readonlybackground => $LCDbg,
-        -validate           => 'key',
-        -validatecommand    => sub {(($_[0] eq "") || ($_[0]=~/^[0-9]+$/ && $_[0]>=0 && $_[0]<=12))},
-        -invalidcommand     => sub {},
-        -textvariable       => \$ry_pbrange
+        -textvariable       => \$ry_pbrange,
+        -command            => sub{ SendRyChMsg(0,10,0,$ry_pbrange); }
     )->pack(-side=>"left");
 
+    # Trigger Notes 1-6
     my @ry_trig;
     my @notesl=@note[35..83];
+    my %noteshash; @noteshash{@notesl}=0..$#notesl;
     for (my $tr=1; $tr<=6; $tr++) {
-
+            my $trg=$tr;
             $tb->Label(
-                -text         => " Trg$tr:",
+                -text         => " Tr$tr:",
                 -font         => 'Sans 9'
             )->pack(-side=>"left");
-
             $ry_trig[$tr]=$tb->BrowseEntry(%BEntry_defaults,
                 -variable     => \$ry_trnote[$tr],
                 -choices      => \@notesl,
                 -font         => 'Sans 9',
-                -width        => 4
+                -width        => 4,
+                -browsecmd    => sub{ SendRyChMsg(0,(10+$trg),0,$noteshash{$ry_trnote[$trg]}); }
             )->pack(-side=>"left");
             $ry_trig[$tr]->Subwidget("choices")->configure(%choices_defaults);
             $ry_trig[$tr]->Subwidget("arrow")->configure(%arrow_defaults);
@@ -1651,7 +1673,7 @@ sub KitEditWin {
         $ryw->Button(
             -font         => 'title',
             -textvariable => \$note[$a+34],
-            -command      => sub{ if ($LINUX) { MIDI::ALSA::output(MIDI::ALSA::noteevent(0,$nn+34,127,0,1)); } }
+            -command      => sub{ if ($LINUX) { MIDI::ALSA::output(MIDI::ALSA::noteevent($ry_ch-1,$nn+34,127,0,1)); } }
         )->grid(-row=>$a, -column=>0, -padx=>4, -sticky=>'nsew');
         for (my $v=0; $v<=$end; $v++) {
             my $aa=$a; my $vv=$v;
@@ -1691,35 +1713,43 @@ sub KitEditWin {
         }
         # Modulation
         $ryw->Checkbutton(
-            -variable     => \$ry_mod[$a]
+            -variable     => \$ry_mod[$a],
+            -command      => sub{ SendRyChMsg($nn,9,0,$ry_mod[$nn]); }
         )->grid(-row=>$a, -column=>9);
         # Balance
         $ryw->Checkbutton(
-            -variable     => \$ry_bal[$a]
+            -variable     => \$ry_bal[$a],
+            -command      => sub{ SendRyChMsg($nn,8,0,$ry_bal[$nn]); }
         )->grid(-row=>$a, -column=>10);
         # Filter
         $ryw->Checkbutton(
-            -variable     => \$ry_flt[$a]
+            -variable     => \$ry_flt[$a],
+            -command      => sub{ SendRyChMsg($nn,7,0,$ry_flt[$nn]); }
         )->grid(-row=>$a, -column=>11);
         # Pan
         $ryw->Checkbutton(
-            -variable     => \$ry_pan[$a]
+            -variable     => \$ry_pan[$a],
+            -command      => sub{ SendRyChMsg($nn,6,0,$ry_pan[$nn]); }
         )->grid(-row=>$a, -column=>12);
         # Decay
         $ryw->Checkbutton(
-            -variable     => \$ry_dcy[$a]
+            -variable     => \$ry_dcy[$a],
+            -command      => sub{ SendRyChMsg($nn,5,0,$ry_dcy[$nn]); }
         )->grid(-row=>$a, -column=>13);
         # Volume
         $ryw->Checkbutton(
-            -variable     => \$ry_vol[$a]
+            -variable     => \$ry_vol[$a],
+            -command      => sub{ SendRyChMsg($nn,4,0,$ry_vol[$nn]); }
         )->grid(-row=>$a, -column=>14);
         # Pitch bend
         $ryw->Checkbutton(
-            -variable     => \$ry_pbd[$a]
+            -variable     => \$ry_pbd[$a],
+            -command      => sub{ SendRyChMsg($nn,3,0,$ry_pbd[$nn]); }
         )->grid(-row=>$a, -column=>15);
         # Key off
         $ryw->Checkbutton(
-            -variable     => \$ry_kyo[$a]
+            -variable     => \$ry_kyo[$a],
+            -command      => sub{ SendRyChMsg($nn,2,0,$ry_kyo[$nn]); }
         )->grid(-row=>$a, -column=>16);
     }
 }
