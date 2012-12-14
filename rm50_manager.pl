@@ -65,7 +65,8 @@ my $Titlebg='#487890';
 my $Titlefg='#F3F3F3';
 
 my $modified=0;
-my $filename="";
+my $filename='';
+my $ryfilename='';
 
 my %Scale_defaults=(
     -width        => 10,
@@ -372,32 +373,33 @@ my @RSC3074_voices=(
     '17:HH Tip R', '18:HH ClHvy', '19:HH1/2 Op', '20:HH Open',  '21:JazzTom1', '22:JazzTom2', '23:RackTom1', '24:RackTom2',
     '25:RackTom3', '26:Flr Tom1', '27:Flr Tom2', '28:SizzCym',  '29:Ride',     '30:Ridebell', '31:Crash',    '32:China' );
 
-# user voice bank mappings
-my %usrvcehash=(
-    'I-MX'=>\@IMX_voices, 'C-MX'=>\@CMX_voices );
-
 # preset voice bank mappings
 my %prevcehash=(
-    'P-BD'=>\@BD_voices, 'P-SD'=>\@SD_voices, 'P-TM'=>\@TM_voices, 'P-CY'=>\@CY_voices, 'P-PC'=>\@PC_voices, 'P-SE'=>\@SE_voices);
+    'P-BD'=>\@BD_voices, 'P-SD'=>\@SD_voices, 'P-TM'=>\@TM_voices, 'P-CY'=>\@CY_voices,
+    'P-PC'=>\@PC_voices, 'P-SE'=>\@SE_voices );
 
-# internal variation voice bank mappings
+# internal variation and user voice bank mappings
 my %intvcehash=(
-    'I-BD'=>\@BD_voices, 'I-SD'=>\@SD_voices, 'I-TM'=>\@TM_voices, 'I-CY'=>\@CY_voices, 'I-PC'=>\@PC_voices, 'I-SE'=>\@SE_voices);
+    'I-BD'=>\@BD_voices, 'I-SD'=>\@SD_voices, 'I-TM'=>\@TM_voices, 'I-CY'=>\@CY_voices,
+    'I-PC'=>\@PC_voices, 'I-SE'=>\@SE_voices, 'I-MX'=>\@IMX_voices );
 
-# data card variation voice bank mappings
+# data card variation and user voice bank mappings
 my %crdvcehash=(
-    'C-BD'=>\@BD_voices, 'C-SD'=>\@SD_voices, 'C-TM'=>\@TM_voices, 'C-CY'=>\@CY_voices, 'C-PC'=>\@PC_voices, 'C-SE'=>\@SE_voices);
+    'C-BD'=>\@BD_voices, 'C-SD'=>\@SD_voices, 'C-TM'=>\@TM_voices, 'C-CY'=>\@CY_voices,
+    'C-PC'=>\@PC_voices, 'C-SE'=>\@SE_voices, 'C-MX'=>\@CMX_voices );
 
 # wave card voice bank mappings (SY55/SY77 waveform cards don't contain voices so the RM50
 # autogenerates a default voice for each waveform, therefore we can reuse the waveform name lists)
 my %wvevcehash=(
-    'RSC3001' => \@RSC3001_voices, 'RSC3002' => \@RSC3002_voices, 'RSC3003' => \@RSC3003_voices, 'RSC3004' => \@RSC3004_voices,
-    'RSC3071' => \@RSC3071_voices, 'RSC3072' => \@RSC3072_voices, 'RSC3073' => \@RSC3073_voices, 'RSC3074' => \@RSC3074_voices,
+    'RSC3001' => \@RSC3001_voices, 'RSC3002' => \@RSC3002_voices,
+    'RSC3003' => \@RSC3003_voices, 'RSC3004' => \@RSC3004_voices,
+    'RSC3071' => \@RSC3071_voices, 'RSC3072' => \@RSC3072_voices,
+    'RSC3073' => \@RSC3073_voices, 'RSC3074' => \@RSC3074_voices,
     'W7701'   => \@W7701,   'W7702'   => \@W7702,   'W7704'   => \@W7704,   'W7705'   => \@W7705,
     'W7731'   => \@W7731,   'W7732'   => \@W7732,   'W7751'   => \@W7751,   'W7752'   => \@W7752 );
 
 # hash containing actual available voice banks on a bare RM50 (no cards)
-my %voiceshash=(%usrvcehash, %prevcehash, %intvcehash);
+my %voiceshash=(%prevcehash, %intvcehash);
 
 # map banks to bank numbers used by parameter change messages 
 my %bankshash=(
@@ -463,6 +465,7 @@ my @midi_devs=MidiPortList();
 my @elm_wave_entry;
 my @wave_source_sel;
 my $midiupload;
+my $rymidiupload;
 my $midiin;
 my $midiout;
 my $voice_dwn_sel;
@@ -509,6 +512,11 @@ my @ry_kyo;
 my $dest_rynr=1;
 # default MIDI channel for playing Rhythm Kit
 my $ry_ch=1;
+# banks hash with additional OFF bank for rhythm kits
+my %rybankshash=(%bankshash, 'OFF'=>46);
+my @OFF_voice=('01:- - - - - - - -');
+my %ryvoiceshash=(%voiceshash, 'OFF'=>\@OFF_voice);
+my @rybanks_array=(sort(keys(%ryvoiceshash)));
 
 # initialise rhythm kit data variables with default values
 NewRyKit();
@@ -706,9 +714,9 @@ sub StatusBar {
         -text         => 'Upload via MIDI to RM50',
         -pady         => 2,
         -underline    => 0,
-        -command      => \&SysexUpload
+        -command      => \&SysexVceUpload
     )->pack(-side=>'right');
-    $mw->bind($mw, "<Control-u>"=>\&SysexUpload);
+    $mw->bind($mw, "<Control-u>"=>\&SysexVceUpload);
 
     if ($midi_outdev ne '') { 
         $midiupload->configure(-state=>'active');
@@ -828,6 +836,31 @@ sub loadFile {
     }
 }
 
+# load a rm50 rhythm kit sysex dump file
+sub loadKit {
+        my $types=[ ['Sysex Files', ['.syx', '.SYX']], ['All Files', '*'] ];
+        my $syx_file=$rywin->getOpenFile(
+            -defaultextension => '.syx',
+            -filetypes        => $types,
+            -title            => 'Open a RM50 Rhythm Kit Sysex file'
+        );
+        if ($syx_file && -r $syx_file) {
+            open my $fh, '<', $syx_file;
+            my $tmp_dump = do { local $/; <$fh> };
+            close $fh;
+            my $check='ok'; #SysexValidate($tmp_dump);
+            # print STDERR $check."\n";
+            if ($check ne 'ok') {
+                Error("Error while opening $syx_file\n\n$check");
+            } else {
+                RySyxRead(\$tmp_dump);
+                $ryfilename=$syx_file;
+            }
+        } elsif ($syx_file) {
+            Error("Error: could not open $syx_file");
+        }
+}
+
 # call as: UnsavedChanges($question), returns: Yes/No
 sub UnsavedChanges {
     my $rtn=$mw->messageBox(
@@ -884,7 +917,7 @@ sub saveFile {
 }
 
 # upload current edited voice to RM50 via Sysex
-sub SysexUpload{
+sub SysexVceUpload {
     SysexWrite();
     my $chksum=chksumCalc($sysex_dump);
     substr($sysex_dump,176,1,chr($chksum));
@@ -895,6 +928,11 @@ sub SysexUpload{
     } elsif ($WINDOWS) {
         # add Windows specific code here
     }
+}
+
+# upload current edited rhythm kit to RM50 via Sysex
+sub SysexRyUpload {
+
 }
 
 # 'About' information window
@@ -921,14 +959,15 @@ sub Error {
 }
 
 # Converts a two byte substring (each byte limited to ASCII 0-9,A-F) at the given
-# offset of the sysex dump data and returns a decimal number between 0-255.
+# offset of the given sysex dump data reference and returns a decimal number between 0-255.
 # Examples: 'FF' => 255  '7F' => 127  '00' => 0
-# Invoke: Syx2Dec( $offset )
+# Invoke: Syx2Dec( \$dump, $offset )
 sub Syx2Dec {
-    return (hex(substr($sysex_dump,$_[0],2)));
+    return (hex(substr(${$_[0]},$_[1],2)));
 }
+
 sub Syx3Dec {
-    return (hex(substr($sysex_dump,$_[0],3)));
+    return (hex(substr(${$_[0]},$_[1],3)));
 }
 
 # Converts a given decimal number between 0-255 into a two byte string containing
@@ -939,50 +978,98 @@ sub Syx3Dec {
 sub Dec2Syx {
     substr($sysex_dump,$_[0],2,sprintf("%02X",$_[1]));
 }
+
 sub Dec3Syx {
     substr($sysex_dump,$_[0],3,sprintf("%03X",$_[1]));
 }
 
+# subroutine that reads all rhythm kit settings from a sysex dump string
+sub RySyxRead {
+    my $dmp=$_[0];
+
+    $kit_name='';
+    for(my $i = 32; $i < 52; $i+=2) {
+        $kit_name=$kit_name.chr(Syx2Dec($dmp,$i));
+    }
+
+    $ry_pbrange   =   (Syx2Dec($dmp,52));
+
+    $ry_trnote[1] =   (Syx2Dec($dmp,54));
+    $ry_trnote[2] =   (Syx2Dec($dmp,56));
+    $ry_trnote[3] =   (Syx2Dec($dmp,58));
+    $ry_trnote[4] =   (Syx2Dec($dmp,60));
+    $ry_trnote[5] =   (Syx2Dec($dmp,62));
+    $ry_trnote[6] =   (Syx2Dec($dmp,64));
+
+    for (my $elm=1; $elm<=49; $elm++) {
+        my $e=(6*($elm-1));
+        my $tmp=Syx2Dec($dmp,76+$e);
+        $ry_mod[$elm] =    ($tmp %   2);
+        $ry_bal[$elm] =int(($tmp %   4) /   2);
+        $ry_flt[$elm] =int(($tmp %   8) /   4);
+        $ry_pan[$elm] =int(($tmp %  16) /   8);
+        $ry_dcy[$elm] =int(($tmp %  32) /  16);
+        $ry_vol[$elm] =int(($tmp %  64) /  32);
+        $ry_pbd[$elm] =int(($tmp % 128) /  64);
+        $ry_kyo[$elm] =int(($tmp % 256) / 128);
+
+        $ry_att[$elm][0]=int((Syx2Dec($dmp,78+$e)%256)/16);
+
+        my %ryhashbanks= reverse %rybankshash;
+        $ry_bank[$elm][0]=$ryhashbanks{((Syx2Dec($dmp,78+$e)%16)*2+int((Syx2Dec($dmp,80+$e)%256)/128))*2};
+        $ry_voice[$elm][0]=${$ryvoiceshash{$ry_bank[$elm][0]}}[(Syx2Dec($dmp,80+$e)%128)];
+
+        # second voice for first 24 notes
+        if ($elm<=24) {
+            my $o=(4*($elm-1));
+            $ry_att[$elm][1]=int((Syx2Dec($dmp,370+$o)%256)/16);
+            $ry_bank[$elm][1]=$ryhashbanks{((Syx2Dec($dmp,370+$o)%16)*2+int((Syx2Dec($dmp,372+$o)%256)/128))*2};
+            $ry_voice[$elm][1]=${$ryvoiceshash{$ry_bank[$elm][1]}}[(Syx2Dec($dmp,372+$o)%128)];
+        }
+    }
+}
+
 # subroutine that reads all voice settings from the sysex dump string
 sub SysexRead {
+    my $dmp=\$sysex_dump;
 
     $voice_name='';
     for(my $i = 50; $i < 66; $i+=2) {
-        $voice_name=$voice_name.chr(Syx2Dec($i));
+        $voice_name=$voice_name.chr(Syx2Dec($dmp,$i));
     }
 
     # values: 0..127
-    $volume             =   (Syx2Dec(32));
+    $volume             =    (Syx2Dec($dmp,32));
     # values: 0..64
-    $pan                =   (Syx2Dec(34)-32);
+    $pan                =    (Syx2Dec($dmp,34)-32);
     # values: 0..128
-    $pitch              =   (Syx2Dec(36)-64);
+    $pitch              =    (Syx2Dec($dmp,36)-64);
     # values: 0..128
-    $decay              =   (Syx2Dec(38)-64);
+    $decay              =    (Syx2Dec($dmp,38)-64);
     # values: 0..128
-    $cfilter_cutoff_freq=   (Syx2Dec(40)-64);
+    $cfilter_cutoff_freq=    (Syx2Dec($dmp,40)-64);
     # values: 0..128
-    $balance            =   (Syx2Dec(42)-64);
+    $balance            =    (Syx2Dec($dmp,42)-64);
     # unknown
-    $b44                =   (Syx2Dec(44));
+    $b44                =    (Syx2Dec($dmp,44));
     # bits 0-2 - values: 0..6
-    $voutput            =   (Syx2Dec(46)%8);
+    $voutput            =    (Syx2Dec($dmp,46)%8);
     # bits 4-6 - values: 0..7
-    $altgroup           =int((Syx2Dec(46)%128)/16);
+    $altgroup           =int((Syx2Dec($dmp,46)%128)/16);
     # bits 0-5 - values: 0..63
-    $indiv_level        =   (Syx2Dec(48)%64);
+    $indiv_level        =    (Syx2Dec($dmp,48)%64);
     # bits 6-7 - values: 0..3
-    $vassign            =int(Syx2Dec(48)/64);
+    $vassign            = int(Syx2Dec($dmp,48)/64);
 
     for (my $elm = 1; $elm <= 2; $elm++) {
         my $e=(52*($elm-1));
         # bits 6-7 0..2 (Preset, Wave Card, Internal RAM)
-        my $tmp                  =       int(Syx2Dec( 74+$e)/64);
+        my $tmp                  =       int(Syx2Dec($dmp, 74+$e)/64);
         if    ($tmp==0) {$wave_source[$elm]=$wsources[0];}
         elsif ($tmp==2) {$wave_source[$elm]=$wsources[1];}
         elsif ($tmp==1) {
             my %idwave=reverse %waveid;
-            my $idnr=Syx3Dec(66+(($elm-1)*3));
+            my $idnr=Syx3Dec($dmp,66+(($elm-1)*3));
             my $card=$idwave{$idnr};
             if ($card && ($wave_card[1]=~/^$card:.*/ || $wave_card[2]=~/^$card:.*/ || $wave_card[3]=~/^$card:.*/)) {
                 $wave_source[$elm]=$card;
@@ -996,71 +1083,71 @@ sub SysexRead {
             }
         }
         # values: 0..132 (Preset), 0..31 (Wave Card), 0..63 (Wave RAM), 255 off
-        UpdateWSel($elm, Syx2Dec( 72+$e));
+        UpdateWSel($elm, Syx2Dec($dmp, 72+$e));
         # bits 0-5 values: 0..63
-        $elm_level[$elm]         =          (Syx2Dec( 74+$e)%64);
+        $elm_level[$elm]         =          (Syx2Dec($dmp, 74+$e)%64);
         # values: 0..32 (16 = centre)
-        $elm_pan[$elm]           =          (Syx2Dec( 76+$e)%64);
+        $elm_pan[$elm]           =          (Syx2Dec($dmp, 76+$e)%64);
         # values: 78:0..72 80:0..99 => display values: -3600 to +3600
-        $elm_pitch[$elm]         =        (((Syx2Dec( 78+$e)%128-36)*100)+Syx2Dec(80+$e)%128);
+        $elm_pitch[$elm]         =        (((Syx2Dec($dmp, 78+$e)%128-36)*100)+Syx2Dec($dmp,80+$e)%128);
         # bit 6  values: 0..1
-        $wave_dir[$elm]          =      int((Syx2Dec( 82+$e)%128)/64);
+        $wave_dir[$elm]          =      int((Syx2Dec($dmp, 82+$e)%128)/64);
         # bits 0-5  values: 0..63
-        $eg_attack[$elm]         =          (Syx2Dec( 82+$e)%64);
+        $eg_attack[$elm]         =          (Syx2Dec($dmp, 82+$e)%64);
         # values: 0..63
-        $eg_decay[$elm]          =          (Syx2Dec( 84+$e)%64);
+        $eg_decay[$elm]          =          (Syx2Dec($dmp, 84+$e)%64);
         # values: 0..63
-        $eg_release[$elm]        =          (Syx2Dec( 86+$e)%64);
+        $eg_release[$elm]        =          (Syx2Dec($dmp, 86+$e)%64);
         # bits 3-5  values: 0..7
-        $eg_punch[$elm]          =      int((Syx2Dec( 88+$e)%64)/8);
+        $eg_punch[$elm]          =      int((Syx2Dec($dmp, 88+$e)%64)/8);
         # bits 0-2  values: 0..4
-        $filter_type[$elm]       =          (Syx2Dec( 88+$e)%8);
+        $filter_type[$elm]       =          (Syx2Dec($dmp, 88+$e)%8);
         # values: 0..127
-        $filter_cutoff_frq[$elm] =          (Syx2Dec( 90+$e)%128);
+        $filter_cutoff_frq[$elm] =          (Syx2Dec($dmp, 90+$e)%128);
         # values: 0..99
-        $filter_resonance[$elm]  =          (Syx2Dec( 92+$e)%128);
+        $filter_resonance[$elm]  =          (Syx2Dec($dmp, 92+$e)%128);
         # values: 0..126 => display values: -63 to +63
-        $filter_eg_level[$elm]   =          (Syx2Dec( 94+$e)%128-63);
+        $filter_eg_level[$elm]   =          (Syx2Dec($dmp, 94+$e)%128-63);
         # values: 0..63
-        $filter_eg_rate[$elm]    =          (Syx2Dec( 96+$e)%64);
+        $filter_eg_rate[$elm]    =          (Syx2Dec($dmp, 96+$e)%64);
         # bits 4-7  dump range: 15..9,0,1..7 => display values: -7 to +7
-        $sens_level[$elm]        = ((int(int(Syx2Dec( 98+$e)/16)/8)*-2+1) * (int(Syx2Dec( 98+$e)/16)%8));
+        $sens_level[$elm]        = ((int(int(Syx2Dec($dmp, 98+$e)/16)/8)*-2+1) * (int(Syx2Dec($dmp, 98+$e)/16)%8));
         # bits 0-3  dump range: 15..9,0,1..7 => display values: -7 to +7
-        $sens_pitch[$elm]        =    ((int((Syx2Dec( 98+$e)%16)/8)*-2+1) *     (Syx2Dec( 98+$e)%8));
+        $sens_pitch[$elm]        =    ((int((Syx2Dec($dmp, 98+$e)%16)/8)*-2+1) *     (Syx2Dec($dmp, 98+$e)%8));
         # bits 4-7  dump range: 15..9,0,1..7 => display values: -7 to +7
-        $sens_eg[$elm]           = ((int(int(Syx2Dec(100+$e)/16)/8)*-2+1) * (int(Syx2Dec(100+$e)/16)%8));
+        $sens_eg[$elm]           = ((int(int(Syx2Dec($dmp,100+$e)/16)/8)*-2+1) * (int(Syx2Dec($dmp,100+$e)/16)%8));
         # bits 0-3  dump range: 15..9,0,1..7 => display values: -7 to +7
-        $sens_filter[$elm]       =    ((int((Syx2Dec(100+$e)%16)/8)*-2+1) *     (Syx2Dec(100+$e)%8));
+        $sens_filter[$elm]       =    ((int((Syx2Dec($dmp,100+$e)%16)/8)*-2+1) *     (Syx2Dec($dmp,100+$e)%8));
         # bits 0-2  values: 0..7
-        $sens_modul[$elm]        =          (Syx2Dec(102+$e)%8);
+        $sens_modul[$elm]        =          (Syx2Dec($dmp,102+$e)%8);
         # bits 4-6  values: 0..5
-        $lfo_wav_shape[$elm]     =      int((Syx2Dec(102+$e)%128)/16);
+        $lfo_wav_shape[$elm]     =      int((Syx2Dec($dmp,102+$e)%128)/16);
         # values: 0..99
-        $lfo_mod_speed[$elm]     =          (Syx2Dec(104+$e)%128);
+        $lfo_mod_speed[$elm]     =          (Syx2Dec($dmp,104+$e)%128);
         # values: 0..99
-        $lfo_delay[$elm]         =          (Syx2Dec(106+$e)%128);
+        $lfo_delay[$elm]         =          (Syx2Dec($dmp,106+$e)%128);
         # bits 0-5  values: 0..63
-        $lfo_phase[$elm]         =          (Syx2Dec(108+$e)%64);
+        $lfo_phase[$elm]         =          (Syx2Dec($dmp,108+$e)%64);
         # bits 6-7  values: 0..3
-        $lfo_destination[$elm]   =       int(Syx2Dec(108+$e)/64);
+        $lfo_destination[$elm]   =       int(Syx2Dec($dmp,108+$e)/64);
         # values: 0..127
-        $lfo_mod_depth[$elm]     =          (Syx2Dec(110+$e)%128);
+        $lfo_mod_depth[$elm]     =          (Syx2Dec($dmp,110+$e)%128);
         # values: 0..144 => display values: -72 to +72
-        $pitch_eg_lvl[$elm]      =          (Syx2Dec(112+$e)-72);
+        $pitch_eg_lvl[$elm]      =          (Syx2Dec($dmp,112+$e)-72);
         # values: 0..63
-        $pitch_eg_rate[$elm]     =          (Syx2Dec(114+$e)%64);
+        $pitch_eg_rate[$elm]     =          (Syx2Dec($dmp,114+$e)%64);
         # bits 0-6  values: 0..127 => display values: 1-128
-        $delay_time[$elm]        =          (Syx2Dec(116+$e)%128+1);
+        $delay_time[$elm]        =          (Syx2Dec($dmp,116+$e)%128+1);
         # bit 7  values: 0..1
-        $del_first_note[$elm]    =       int(Syx2Dec(116+$e)/128);
+        $del_first_note[$elm]    =       int(Syx2Dec($dmp,116+$e)/128);
         # bits 5-7  dump range: 0..7 => display values: off,1-7
-        $delay_repetition[$elm]  =       int(Syx2Dec(118+$e)/32);
+        $delay_repetition[$elm]  =       int(Syx2Dec($dmp,118+$e)/32);
         # bits 0-4  dump range: 17..31,0,1..15 => display values: -15 to +15
-        $delay_lvl_offset[$elm]  =    ((int((Syx2Dec(118+$e)%32)/16)*-16)+(Syx2Dec(118+$e)%16));
+        $delay_lvl_offset[$elm]  =    ((int((Syx2Dec($dmp,118+$e)%32)/16)*-16)+(Syx2Dec($dmp,118+$e)%16));
         # dump range: 136..255,0,0..120 => display values: -12.0 to +12.0
-        $delay_pch_offset[$elm]  =    (((int(Syx2Dec(120+$e)/128)*-128) + (Syx2Dec(120+$e)%128))/10);
+        $delay_pch_offset[$elm]  =    (((int(Syx2Dec($dmp,120+$e)/128)*-128) + (Syx2Dec($dmp,120+$e)%128))/10);
         # values: 0..11
-        $elm_velcurve[$elm]      = $vlcurves[Syx2Dec(122+$e)%16];
+        $elm_velcurve[$elm]      = $vlcurves[Syx2Dec($dmp,122+$e)%16];
     }
 }
 
@@ -1247,7 +1334,7 @@ sub SendWvChMsg {
 sub SendVcChMsg {
     my $elm=$_[0]; # 1..49
     my $vnr=$_[1]; # 0,1
-    my $bnk=($bankshash{$ry_bank[$elm][$vnr]})/2;
+    my $bnk=($rybankshash{$ry_bank[$elm][$vnr]})/2;
     my ($vce)=($ry_voice[$elm][$vnr]=~/^(\d+):.*/);
     SendRyChMsg($elm,($vnr*10),$bnk,$vce-1);
 }
@@ -1337,6 +1424,7 @@ sub InsRemDatCard {
     # no data card inserted
     if ($data_card eq $datacards[0]) {
         delete @voiceshash{keys %crdvcehash};
+        delete @ryvoiceshash{keys %crdvcehash};
         RefreshBnkDwnList();
         if ($selected_bank=~/^C-\w\w$/) {
             $selected_bank="I-MX";
@@ -1346,18 +1434,21 @@ sub InsRemDatCard {
     # MCD32 data card inserted (only 1 bank)
     elsif ($data_card eq $datacards[1]) {
         %voiceshash=(%voiceshash, %crdvcehash);
+        %ryvoiceshash=(%ryvoiceshash, %crdvcehash);
         RefreshBnkDwnList();
     }
     # MCD64 data card inserted using bank 1
     elsif ($data_card eq $datacards[2]) {
         SendGenPaChMsg(4, 0, 0, 6, 7, 0, 0);
         %voiceshash=(%voiceshash, %crdvcehash);
+        %ryvoiceshash=(%ryvoiceshash, %crdvcehash);
         RefreshBnkDwnList();
     }
     # MCD64 data card inserted using bank 2
     elsif ($data_card eq $datacards[3]) {
         SendGenPaChMsg(4, 0, 0, 6, 7, 0, 1);
         %voiceshash=(%voiceshash, %crdvcehash);
+        %ryvoiceshash=(%ryvoiceshash, %crdvcehash);
         RefreshBnkDwnList();
     }
 }
@@ -1528,16 +1619,20 @@ sub RefreshVceList {
     my $v=$_[1];
     my $reset=$_[2];
     $ry_voice_sel[$a][$v]->delete( 0, "end" );
-    $ry_voice_sel[$a][$v]->insert("end", $_) for (@{$voiceshash{$ry_bank[$a][$v]}});
-    if ($reset) { $ry_voice[$a][$v]=${$voiceshash{$ry_bank[$a][$v]}}[0]; }
+    $ry_voice_sel[$a][$v]->insert("end", $_) for (@{$ryvoiceshash{$ry_bank[$a][$v]}});
+    if ($reset) {
+        $ry_voice[$a][$v]=${$ryvoiceshash{$ry_bank[$a][$v]}}[0];
+        SendVcChMsg($a, $v);
+    }
 }
 
 # Refresh a rhythm kit editor banks pulldown list
 sub RefreshBnkList {
     my $a=$_[0];
     my $v=$_[1];
+    @rybanks_array=(sort(keys(%ryvoiceshash)));
     $ry_bank_sel[$a][$v]->delete( 0, "end" );
-    $ry_bank_sel[$a][$v]->insert("end", $_) for (@banks_array);
+    $ry_bank_sel[$a][$v]->insert("end", $_) for (@rybanks_array);
 }
 
 #-------------------------------------------------------------------------------------------------------------------------
@@ -1762,6 +1857,36 @@ sub KitEditWin {
             -command      => sub{ SendRyChMsg($nn,2,0,$ry_kyo[$nn]); }
         )->grid(-row=>$a, -column=>16);
     }
+
+    # bottom status bar
+    my $stb=$rywin->Frame(
+        -borderwidth  => 1,
+        -relief       => 'raised'
+    ) -> pack(-side=>'bottom', -fill=>'x', -anchor=>'s');
+
+    my $file_display=$stb->Label(
+        -anchor       => 'w',
+        -relief       => 'sunken',
+        -borderwidth  => 1,
+        -width        => 82,
+        -font         => 'Sans 9',
+        -textvariable => \$ryfilename
+    )->pack(-side=>'left', -padx=>2, -pady=>2);
+
+    $rymidiupload=$stb->Button(
+        -text         => 'Upload via MIDI to RM50',
+        -pady         => 2,
+        -underline    => 0,
+        -command      => \&SysexRyUpload
+    )->pack(-side=>'right');
+    $rywin->bind($rywin, "<Control-u>"=>\&SysexRyUpload);
+
+    if ($midi_outdev ne '') {
+        $rymidiupload->configure(-state=>'active');
+    } else {
+        $rymidiupload->configure(-state=>'disabled');
+    }
+
 }
 
 #-------------------------------------------------------------------------------------------------------------------------
