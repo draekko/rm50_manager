@@ -453,6 +453,8 @@ for (my $nnr=1; $nnr<=4; $nnr++) {
         push (@note, $keys[$ky-1].$nnr);
     }
 }
+my @notesl=@note[35..83];
+my %noteshash; @noteshash{@notesl}=0..$#notesl;
 
 # selected and available midi in/out devices
 my $midi_outdev="";
@@ -972,19 +974,20 @@ sub Syx3Dec {
 
 # Converts a given decimal number between 0-255 into a two byte string containing
 # the MSB and the LSB of the hex representation of the decimal number given and
-# writes it at the given offset into the sysex dump data string.
+# writes it at the given offset into the sysex dump data string provided as reference.
 # Examples: 0 => '00'  127 => '7F'  255 => 'FF'
-# Invoke: Dec2Syx( $offset, $dec_value )
+# Invoke: Dec2Syx( \$dump, $offset, $dec_value )
 sub Dec2Syx {
-    substr($sysex_dump,$_[0],2,sprintf("%02X",$_[1]));
+    substr(${$_[0]},$_[1],2,sprintf("%02X",$_[2]));
 }
 
 sub Dec3Syx {
-    substr($sysex_dump,$_[0],3,sprintf("%03X",$_[1]));
+    substr(${$_[0]},$_[1],3,sprintf("%03X",$_[2]));
 }
 
 # subroutine that reads all rhythm kit settings from a sysex dump string
 sub RySyxRead {
+    # needs to be reference to dump string
     my $dmp=$_[0];
 
     $kit_name='';
@@ -992,26 +995,26 @@ sub RySyxRead {
         $kit_name=$kit_name.chr(Syx2Dec($dmp,$i));
     }
 
-    $ry_pbrange   =   (Syx2Dec($dmp,52));
+    $ry_pbrange  =      (Syx2Dec($dmp,52));
 
-    $ry_trnote[1] =   (Syx2Dec($dmp,54));
-    $ry_trnote[2] =   (Syx2Dec($dmp,56));
-    $ry_trnote[3] =   (Syx2Dec($dmp,58));
-    $ry_trnote[4] =   (Syx2Dec($dmp,60));
-    $ry_trnote[5] =   (Syx2Dec($dmp,62));
-    $ry_trnote[6] =   (Syx2Dec($dmp,64));
+    $ry_trnote[1]=$notesl[(Syx2Dec($dmp,54))];
+    $ry_trnote[2]=$notesl[(Syx2Dec($dmp,56))];
+    $ry_trnote[3]=$notesl[(Syx2Dec($dmp,58))];
+    $ry_trnote[4]=$notesl[(Syx2Dec($dmp,60))];
+    $ry_trnote[5]=$notesl[(Syx2Dec($dmp,62))];
+    $ry_trnote[6]=$notesl[(Syx2Dec($dmp,64))];
 
     for (my $elm=1; $elm<=49; $elm++) {
         my $e=(6*($elm-1));
         my $tmp=Syx2Dec($dmp,76+$e);
-        $ry_mod[$elm] =    ($tmp %   2);
-        $ry_bal[$elm] =int(($tmp %   4) /   2);
-        $ry_flt[$elm] =int(($tmp %   8) /   4);
-        $ry_pan[$elm] =int(($tmp %  16) /   8);
-        $ry_dcy[$elm] =int(($tmp %  32) /  16);
-        $ry_vol[$elm] =int(($tmp %  64) /  32);
-        $ry_pbd[$elm] =int(($tmp % 128) /  64);
-        $ry_kyo[$elm] =int(($tmp % 256) / 128);
+        $ry_mod[$elm]=    ($tmp %   2);
+        $ry_bal[$elm]=int(($tmp %   4) /   2);
+        $ry_flt[$elm]=int(($tmp %   8) /   4);
+        $ry_pan[$elm]=int(($tmp %  16) /   8);
+        $ry_dcy[$elm]=int(($tmp %  32) /  16);
+        $ry_vol[$elm]=int(($tmp %  64) /  32);
+        $ry_pbd[$elm]=int(($tmp % 128) /  64);
+        $ry_kyo[$elm]=int(($tmp % 256) / 128);
 
         $ry_att[$elm][0]=int((Syx2Dec($dmp,78+$e)%256)/16);
 
@@ -1027,6 +1030,11 @@ sub RySyxRead {
             $ry_voice[$elm][1]=${$ryvoiceshash{$ry_bank[$elm][1]}}[(Syx2Dec($dmp,372+$o)%128)];
         }
     }
+}
+
+# subroutine that writes all rhythm kit settings to a sysex dump string
+sub RySyxWrite {
+
 }
 
 # subroutine that reads all voice settings from the sysex dump string
@@ -1153,70 +1161,71 @@ sub SysexRead {
 
 # subroutine that writes all current voice settings to the sysex dump string
 sub SysexWrite {
+    my $dmp=\$sysex_dump;
     my $nam_len=length($voice_name);
     # pad voice name with spaces if less than 8 chars
     if ($nam_len<8) { $voice_name=$voice_name." "x(8-$nam_len); }
     for(my $i = 50; $i < 66; $i+=2) {
-        Dec2Syx($i, ord(substr($voice_name,(($i-50)/2),1)) );
+        Dec2Syx($dmp,$i, ord(substr($voice_name,(($i-50)/2),1)) );
     }
     # write current device number to sysex dump file
     substr($sysex_dump,2,1,chr($dev_nr-1));
     # write current voice destination number to sysex dump file
     substr($sysex_dump,31,1,chr($dest_vnr-1));
-    Dec2Syx( 32, $volume );
-    Dec2Syx( 34, ($pan + 32 ));
-    Dec2Syx( 36, ($pitch + 64 ));
-    Dec2Syx( 38, ($decay + 64 ));
-    Dec2Syx( 40, ($cfilter_cutoff_freq + 64 ));
-    Dec2Syx( 42, ($balance + 64 ));
-    Dec2Syx( 44, $b44);
-    Dec2Syx( 46, (($altgroup *16) + $voutput ));
-    Dec2Syx( 48, (($vassign  *64) + $indiv_level ));
+    Dec2Syx($dmp, 32, $volume );
+    Dec2Syx($dmp, 34, ($pan + 32 ));
+    Dec2Syx($dmp, 36, ($pitch + 64 ));
+    Dec2Syx($dmp, 38, ($decay + 64 ));
+    Dec2Syx($dmp, 40, ($cfilter_cutoff_freq + 64 ));
+    Dec2Syx($dmp, 42, ($balance + 64 ));
+    Dec2Syx($dmp, 44, $b44);
+    Dec2Syx($dmp, 46, (($altgroup *16) + $voutput ));
+    Dec2Syx($dmp, 48, (($vassign  *64) + $indiv_level ));
 
     for (my $elm = 1; $elm <= 2; $elm++) {
         my $e=(52*($elm-1));
         my ($wavnr)=($elm_wave[$elm]=~/^(\d+):.*/);
-        Dec2Syx( 72+$e, ($wavnr-1) );
+        Dec2Syx($dmp, 72+$e, ($wavnr-1) );
         my $tmp=0;
         if ($wave_source[$elm] eq $wsources[0]) {
             $tmp=0;
-            Dec3Syx( 66+(($elm-1)*3), 4095 );
+            Dec3Syx($dmp, 66+(($elm-1)*3), 4095 );
         } elsif ($wave_source[$elm] eq $wsources[1]) {
             $tmp=2;
-            Dec3Syx( 66+(($elm-1)*3), 4095 );
+            Dec3Syx($dmp, 66+(($elm-1)*3), 4095 );
         } else  {
             $tmp=1;
-            Dec3Syx( 66+(($elm-1)*3), $waveid{$wave_source[$elm]});
+            Dec3Syx($dmp, 66+(($elm-1)*3), $waveid{$wave_source[$elm]});
         }
-        Dec2Syx( 74+$e, ($tmp *64) + $elm_level[$elm] );
-        Dec2Syx( 76+$e, $elm_pan[$elm] );
-        Dec2Syx( 78+$e, (int($elm_pitch[$elm]/100)+36) );
-        Dec2Syx( 80+$e, abs($elm_pitch[$elm]%100) );
-        Dec2Syx( 82+$e, ($wave_dir[$elm] *64) + $eg_attack[$elm] );
-        Dec2Syx( 84+$e, $eg_decay[$elm] );
-        Dec2Syx( 86+$e, $eg_release[$elm] );
-        Dec2Syx( 88+$e, ($eg_punch[$elm] *8) + $filter_type[$elm] );
-        Dec2Syx( 90+$e, $filter_cutoff_frq[$elm] );
-        Dec2Syx( 92+$e, $filter_resonance[$elm] );
-        Dec2Syx( 94+$e, ($filter_eg_level[$elm] +63) );
-        Dec2Syx( 96+$e, $filter_eg_rate[$elm] );
-        Dec2Syx( 98+$e, ( (abs((int($sens_level[$elm] /($sens_level[$elm] +0.1))*8) - $sens_level[$elm] ) *16)
-                        + (abs((int($sens_pitch[$elm] /($sens_pitch[$elm] +0.1))*8) - $sens_pitch[$elm] )    ) ) );
-        Dec2Syx(100+$e, ( (abs((int($sens_eg[$elm]    /($sens_eg[$elm]    +0.1))*8) - $sens_eg[$elm]    ) *16)
-                        + (abs((int($sens_filter[$elm]/($sens_filter[$elm]+0.1))*8) - $sens_filter[$elm])    ) ) );
-        Dec2Syx(102+$e, ($lfo_wav_shape[$elm] *16) + $sens_modul[$elm] );
-        Dec2Syx(104+$e, $lfo_mod_speed[$elm] );
-        Dec2Syx(106+$e, $lfo_delay[$elm] );
-        Dec2Syx(108+$e, ($lfo_destination[$elm] *64) + $lfo_phase[$elm] );
-        Dec2Syx(110+$e, $lfo_mod_depth[$elm] );
-        Dec2Syx(112+$e, ($pitch_eg_lvl[$elm] +72) );
-        Dec2Syx(114+$e, $pitch_eg_rate[$elm] );
-        Dec2Syx(116+$e, ($del_first_note[$elm] *128) + ($delay_time[$elm] -1) );
-        Dec2Syx(118+$e, (($delay_repetition[$elm] *32)
+        Dec2Syx($dmp, 74+$e, ($tmp *64) + $elm_level[$elm] );
+        Dec2Syx($dmp, 76+$e, $elm_pan[$elm] );
+        Dec2Syx($dmp, 78+$e, (int($elm_pitch[$elm]/100)+36) );
+        Dec2Syx($dmp, 80+$e, abs($elm_pitch[$elm]%100) );
+        Dec2Syx($dmp, 82+$e, ($wave_dir[$elm] *64) + $eg_attack[$elm] );
+        Dec2Syx($dmp, 84+$e, $eg_decay[$elm] );
+        Dec2Syx($dmp, 86+$e, $eg_release[$elm] );
+        Dec2Syx($dmp, 88+$e, ($eg_punch[$elm] *8) + $filter_type[$elm] );
+        Dec2Syx($dmp, 90+$e, $filter_cutoff_frq[$elm] );
+        Dec2Syx($dmp, 92+$e, $filter_resonance[$elm] );
+        Dec2Syx($dmp, 94+$e, ($filter_eg_level[$elm] +63) );
+        Dec2Syx($dmp, 96+$e, $filter_eg_rate[$elm] );
+        Dec2Syx($dmp, 98+$e, ( (abs((int($sens_level[$elm] /($sens_level[$elm] +0.1))*8) - $sens_level[$elm] ) *16)
+                             + (abs((int($sens_pitch[$elm] /($sens_pitch[$elm] +0.1))*8) - $sens_pitch[$elm] )    ) ) );
+        Dec2Syx($dmp,100+$e, ( (abs((int($sens_eg[$elm]    /($sens_eg[$elm]    +0.1))*8) - $sens_eg[$elm]    ) *16)
+                             + (abs((int($sens_filter[$elm]/($sens_filter[$elm]+0.1))*8) - $sens_filter[$elm])    ) ) );
+        Dec2Syx($dmp,102+$e, ($lfo_wav_shape[$elm] *16) + $sens_modul[$elm] );
+        Dec2Syx($dmp,104+$e, $lfo_mod_speed[$elm] );
+        Dec2Syx($dmp,106+$e, $lfo_delay[$elm] );
+        Dec2Syx($dmp,108+$e, ($lfo_destination[$elm] *64) + $lfo_phase[$elm] );
+        Dec2Syx($dmp,110+$e, $lfo_mod_depth[$elm] );
+        Dec2Syx($dmp,112+$e, ($pitch_eg_lvl[$elm] +72) );
+        Dec2Syx($dmp,114+$e, $pitch_eg_rate[$elm] );
+        Dec2Syx($dmp,116+$e, ($del_first_note[$elm] *128) + ($delay_time[$elm] -1) );
+        Dec2Syx($dmp,118+$e, (($delay_repetition[$elm] *32)
                       + (abs((int($delay_lvl_offset[$elm] /($delay_lvl_offset[$elm]+ 0.1))*-32)  - $delay_lvl_offset[$elm])) ) );
-        Dec2Syx(120+$e, (abs((int($delay_pch_offset[$elm] /($delay_pch_offset[$elm]+ 0.01))*-256) - $delay_pch_offset[$elm])*10) );
+        Dec2Syx($dmp,120+$e, (abs((int($delay_pch_offset[$elm] /($delay_pch_offset[$elm]+ 0.01))*-256) - $delay_pch_offset[$elm])*10) );
         my ($velcnr)=($elm_velcurve[$elm]=~/^(\d+):.*/);
-        Dec2Syx(122+$e, ($velcnr-1) );
+        Dec2Syx($dmp,122+$e, ($velcnr-1) );
     }
 }
 
@@ -1730,8 +1739,6 @@ sub KitEditWin {
 
     # Trigger Notes 1-6
     my @ry_trig;
-    my @notesl=@note[35..83];
-    my %noteshash; @noteshash{@notesl}=0..$#notesl;
     for (my $tr=1; $tr<=6; $tr++) {
             my $trg=$tr;
             $tb->Label(
