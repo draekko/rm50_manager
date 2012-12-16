@@ -569,8 +569,11 @@ my $dest_vnr=1;
 # initialise RM50 single voice sysex dump file
 my $sysex_dump="\xF0\x43".chr($dev_nr-1)."\x7A\x01\x2ALM  0087VC"."\x00"x15 .chr($dest_vnr-1)."\x00"x144 ."\x00\xF7";
 
+# initialise RM50 single rhythm kit sysex dump file
+my $ry_syx_dump="\xF0\x43".chr($dev_nr-1)."\x7A\x03\x4CLM  0087KT"."\x00"x15 .chr($dest_rynr-1)."\x00"x434 ."\x00\xF7";
+
 # initialise voice data variables with default values
-newFile();
+newVoice();
 
 # set up main program window
 my $mw=MainWindow->new();
@@ -664,7 +667,10 @@ sub topMenubar {
     $mf1=$mw->Frame(-borderwidth=>1, -relief=>'raised')->pack(-side=>'top', -expand=>1, -fill=>'x', -anchor=>'n');
 
     my $btn0=$mf1->Menubutton(-text=>'File', -underline=>0, -tearoff=>0, -anchor=>'w',
-       -menuitems => [['command'=>'New',        -accelerator=>'Ctrl+N',  -command=>sub{ newFile(); UpdateWSel(1, 0); UpdateWSel(2, 0); } ],
+       -menuitems => [['command'=>'New',        -accelerator=>'Ctrl+N',  -command=>sub{ newVoice();
+                                                                                        UpdateWSel(1, 0);
+                                                                                        UpdateWSel(2, 0);
+                                                                                      }         ],
                       ['command'=>'Open...',    -accelerator=>'Ctrl+O',  -command=>\&loadFile   ],
                       "-",
                       ['command'=>'Save',       -accelerator=>'Ctrl+S',  -command=>\&saveFile   ],
@@ -676,12 +682,13 @@ sub topMenubar {
     $mw->bind($mw, "<Control-a>"=>\&saveasFile);
     $mw->bind($mw, "<Control-s>"=>\&saveFile);
     $mw->bind($mw, "<Control-o>"=>\&loadFile);
-    $mw->bind($mw, "<Control-n>"=>sub{ newFile(); UpdateWSel(1, 0); UpdateWSel(2, 0); });
+    $mw->bind($mw, "<Control-n>"=>sub{ newVoice(); UpdateWSel(1, 0); UpdateWSel(2, 0); });
     
 
     my $btn1=$mf1->Menubutton(-text=>'Edit', -underline=>0, -tearoff=>0, -anchor=>'w',
        -menuitems => [['command'=>'Rhythm Kit Editor...', -command=>sub{ if (! Exists($rywin)) { KitEditWin(); }
-                                                                         else { $rywin->deiconify(); $rywin->raise(); } } ],
+                                                                         else { $rywin->deiconify(); $rywin->raise(); }
+                                                                       }            ],
                       "-",
                       ['command'=>'Save Settings',        -command=>\&SaveSettings ]]
     )->pack(-side=>"left");
@@ -823,7 +830,6 @@ sub loadFile {
             my $tmp_dump = do { local $/; <$fh> };
             close $fh;
             my $check=SysexValidate($tmp_dump);
-            # print STDERR $check."\n";
             if ($check ne 'ok') {
                 Error("Error while opening $syx_file\n\n$check");
             } else {
@@ -850,8 +856,7 @@ sub loadKit {
             open my $fh, '<', $syx_file;
             my $tmp_dump = do { local $/; <$fh> };
             close $fh;
-            my $check='ok'; #SysexValidate($tmp_dump);
-            # print STDERR $check."\n";
+            my $check=RySyxValidate(\$tmp_dump);
             if ($check ne 'ok') {
                 Error("Error while opening $syx_file\n\n$check");
             } else {
@@ -890,7 +895,7 @@ sub saveasFile {
             return;
         }
         SysexWrite();
-        my $chksum=chksumCalc($sysex_dump);
+        my $chksum=chksumCalc(\$sysex_dump);
         substr($sysex_dump,176,1,chr($chksum));
         print $fh $sysex_dump;
         close $fh;
@@ -899,16 +904,39 @@ sub saveasFile {
     }
 }
 
+# save edited rhythm kit to single rhythm kit sysex dump file
+sub saveasKit {
+    my $types=[ ['Sysex Files', ['.syx', '.SYX']], ['All Files', '*'] ];
+        my $syx_file=$rywin->getSaveFile(
+            -defaultextension => ".syx",
+            -filetypes        => $types,
+            -title            => "Save as"
+        );
+    if ($syx_file) {
+        my $fh;
+        unless (open $fh, '>', $syx_file) {
+            Error("Error: cannot save to file $syx_file\nCheck filesystem permissions.");
+            return;
+        }
+        RySyxWrite(\$ry_syx_dump);
+        my $chksum=chksumCalc(\$ry_syx_dump);
+        substr($ry_syx_dump,466,1,chr($chksum));
+        print $fh $ry_syx_dump;
+        close $fh;
+        $ryfilename=$syx_file;
+    }
+}
+
 # save edited voice to previously opened single voice sysex dump file
 sub saveFile {
-    if ($filename ne "") {
+    if ($filename ne '') {
         my $fh;
         unless (open $fh, '>', $filename) {
             Error("Error: cannot save to file $filename\nCheck filesystem permissions.");
             return;
         }
         SysexWrite();
-        my $chksum=chksumCalc($sysex_dump);
+        my $chksum=chksumCalc(\$sysex_dump);
         substr($sysex_dump,176,1,chr($chksum));
         print $fh $sysex_dump;
         close $fh;
@@ -918,10 +946,28 @@ sub saveFile {
     }
 }
 
+# save edited rhythm kit to previously opened single voice sysex dump file
+sub saveKit {
+    if ($ryfilename ne '') {
+        my $fh;
+        unless (open $fh, '>', $ryfilename) {
+            Error("Error: cannot save to file $ryfilename\nCheck filesystem permissions.");
+            return;
+        }
+        RySyxWrite(\$ry_syx_dump);
+        my $chksum=chksumCalc(\$ry_syx_dump);
+        substr($ry_syx_dump,466,1,chr($chksum));
+        print $fh $ry_syx_dump;
+        close $fh;
+    } else {
+        saveasKit();
+    }
+}
+
 # upload current edited voice to RM50 via Sysex
 sub SysexVceUpload {
     SysexWrite();
-    my $chksum=chksumCalc($sysex_dump);
+    my $chksum=chksumCalc(\$sysex_dump);
     substr($sysex_dump,176,1,chr($chksum));
     my $ddata=substr($sysex_dump,1,(length($sysex_dump)-2));
     if ($LINUX) {
@@ -934,7 +980,16 @@ sub SysexVceUpload {
 
 # upload current edited rhythm kit to RM50 via Sysex
 sub SysexRyUpload {
-
+    RySyxWrite(\$ry_syx_dump);
+    my $chksum=chksumCalc(\$ry_syx_dump);
+    substr($ry_syx_dump,466,1,chr($chksum));
+    my $ddata=substr($ry_syx_dump,1,(length($ry_syx_dump)-2));
+    if ($LINUX) {
+        MIDI::ALSA::output( MIDI::ALSA::sysex(0,$ddata,0));
+        MIDI::ALSA::syncoutput();
+    } elsif ($WINDOWS) {
+        # add Windows specific code here
+    }
 }
 
 # 'About' information window
@@ -1033,8 +1088,51 @@ sub RySyxRead {
 }
 
 # subroutine that writes all rhythm kit settings to a sysex dump string
-sub RySyxWrite {
+sub  RySyxWrite {
+    # needs to be reference to dump string
+    my $dmp=$_[0];
 
+    my $nam_len=length($kit_name);
+    # pad kit name with spaces if less than 10 chars
+    if ($nam_len<10) { $kit_name=$kit_name." "x(10-$nam_len); }
+    for(my $i = 32; $i < 52; $i+=2) {
+        Dec2Syx($dmp,$i, ord(substr($kit_name,(($i-32)/2),1)) );
+    }
+
+    # write current device number to sysex dump file
+    substr(${$dmp},2,1,chr($dev_nr-1));
+    # write current voice destination number to sysex dump file
+    substr(${$dmp},31,1,chr($dest_rynr-1));
+
+    Dec2Syx($dmp, 52, $ry_pbrange );
+
+    Dec2Syx($dmp, 54, $noteshash{$ry_trnote[1]} );
+    Dec2Syx($dmp, 56, $noteshash{$ry_trnote[2]} );
+    Dec2Syx($dmp, 58, $noteshash{$ry_trnote[3]} );
+    Dec2Syx($dmp, 60, $noteshash{$ry_trnote[4]} );
+    Dec2Syx($dmp, 62, $noteshash{$ry_trnote[5]} );
+    Dec2Syx($dmp, 64, $noteshash{$ry_trnote[6]} );
+
+    for (my $elm=1; $elm<=49; $elm++) {
+        my $e=(6*($elm-1));
+
+        Dec2Syx($dmp, 76+$e, ( $ry_mod[$elm]     + ($ry_bal[$elm]* 2) + ($ry_flt[$elm]* 4) + ($ry_pan[$elm]*  8) +
+                              ($ry_dcy[$elm]*16) + ($ry_vol[$elm]*32) + ($ry_pbd[$elm]*64) + ($ry_kyo[$elm]*128) ) );
+
+        my $tmp_bank=($rybankshash{$ry_bank[$elm][0]}/2);
+        my ($tmp_vce)=($ry_voice[$elm][0]=~/^(\d+):.*/);
+        Dec2Syx($dmp, 78+$e, (($ry_att[$elm][0]*16) + int($tmp_bank/2)) );
+        Dec2Syx($dmp, 80+$e, (($tmp_vce - 1) + ($tmp_bank % 2)*128) );
+
+        # second voice for first 24 notes
+        if ($elm<=24) {
+            my $o=(4*($elm-1));
+            my $tmp_bank2=($rybankshash{$ry_bank[$elm][1]}/2);
+            my ($tmp_vce2)=($ry_voice[$elm][1]=~/^(\d+):.*/);
+            Dec2Syx($dmp,370+$o, (($ry_att[$elm][1]*16) + int($tmp_bank2/2)) );
+            Dec2Syx($dmp,372+$o, (($tmp_vce2 - 1) + ($tmp_bank2 % 2)*128) );
+        }
+    }
 }
 
 # subroutine that reads all voice settings from the sysex dump string
@@ -1230,8 +1328,8 @@ sub SysexWrite {
 }
 
 # initialise all voice data with default values
-sub newFile {
-    $voice_name          = "Unnamed ";
+sub newVoice {
+    $voice_name          = 'Unnamed ';
     $volume              = 127;
     $balance             = 0;
     $pan                 = 0;
@@ -1244,7 +1342,7 @@ sub newFile {
     $voutput             = 0;
     $indiv_level         = 63;
     for (my $elm = 1; $elm <= 2; $elm++) {
-        $wave_source[$elm] = "Preset";
+        $wave_source[$elm] = 'Preset';
         $elm_wave[$elm]  = ${$wavehash{$wave_source[$elm]}}[0];
         $wave_dir[$elm]  = 0;
         $elm_level[$elm] = 63;
@@ -1277,10 +1375,42 @@ sub newFile {
         $delay_time[$elm]       = 1;
         $delay_lvl_offset[$elm] = 0;
         $delay_pch_offset[$elm] = 0;
-        $elm_velcurve[$elm] = "1:Linear";
+        $elm_velcurve[$elm] = '1:Linear';
     }
     $modified=0;
-    $filename="";
+    $filename='';
+}
+
+# initialise rhythm kit
+sub NewRyKit {
+    $ryfilename='';
+    $kit_name='Unnamed   ';
+    $ry_pbrange=0;
+
+    $ry_trnote[1]='C 1';
+    $ry_trnote[2]='D 1';
+    $ry_trnote[3]='D 2';
+    $ry_trnote[4]='B 1';
+    $ry_trnote[5]='G 1';
+    $ry_trnote[6]='F 1';
+
+    for (my $a=1; $a<=49; $a++) {
+        my $end;
+        if ($a<=24) { $end=1; } else { $end=0; }
+        for (my $v=0; $v<=$end; $v++) {
+            $ry_bank[$a][$v]='OFF';
+            $ry_voice[$a][$v]=${$ryvoiceshash{$ry_bank[$a][$v]}}[0];
+            $ry_att[$a][$v]='0';
+        }
+        $ry_mod[$a]='0';
+        $ry_bal[$a]='0';
+        $ry_flt[$a]='0';
+        $ry_pan[$a]='0';
+        $ry_dcy[$a]='0';
+        $ry_vol[$a]='0';
+        $ry_pbd[$a]='0';
+        $ry_kyo[$a]='0';
+    }
 }
 
 # check that the sysex dump is a valid RM50 single voice dump
@@ -1292,7 +1422,7 @@ sub SysexValidate {
     # check correct header, footer and valid content
     $tmp_dump=~/^\xF0\x43[\x00-\x0F]\x7A\x01\x2ALM  0087VC\x00{15}[\x00-\x7F]{146}\xF7$/ or return "invalid sysex data";
     # calculate checksum
-    my $chksum=chksumCalc($tmp_dump);
+    my $chksum=chksumCalc(\$tmp_dump);
     # expected checksum
     my $expsum=(ord(substr($tmp_dump,176,1)));
     # compare
@@ -1300,12 +1430,31 @@ sub SysexValidate {
     return "ok";
 }
 
+# check that the sysex dump is a valid RM50 single rhythm kit dump
+# To invoke: RySyxValidate(\$dump)
+sub RySyxValidate {
+    my $ref_dump=$_[0];
+    # check length
+    my $dump_len=length(${$ref_dump});
+    $dump_len==468 or return "incorrect sysex length";
+    # check correct header, footer and valid content
+    ${$ref_dump}=~/^\xF0\x43[\x00-\x0F]\x7A\x03\x4CLM  0087KT\x00{15}[\x00-\x7F]{436}\xF7$/ or return "invalid sysex data";
+    # calculate checksum
+    my $chksum=chksumCalc($ref_dump);
+    # expected checksum
+    my $expsum=(ord(substr(${$ref_dump},466,1)));
+    # compare
+    ($chksum == $expsum) or return "incorrect sysex checksum";
+    return "ok";
+}
+
 # calculate sysex data checksum
+# To invoke: chksumCalc(\$dump)
 sub chksumCalc {
-    my $tmp_dump=$_[0];
+    my $ref_dump=$_[0];
     my $chksum=0;
-    for (my $b=6; $b<176; $b++) {
-        $chksum+=ord(substr($tmp_dump,$b,1));
+    for (my $b=6; $b<(length(${$ref_dump})-2); $b++) {
+        $chksum+=ord(substr(${$ref_dump},$b,1));
     }
     $chksum=(-$chksum & 0x7f);
     return $chksum;
@@ -1599,27 +1748,6 @@ sub RcvSnglVceDmp {
             Error("Error: $result");
             return 1;
         }
-}
-
-# initialise rhythm kit
-sub NewRyKit {
-    for (my $a=1; $a<=49; $a++) {
-        my $end;
-        if ($a<=24) { $end=1; } else { $end=0; }
-        for (my $v=0; $v<=$end; $v++) {
-            $ry_bank[$a][$v]='P-BD';
-            $ry_voice[$a][$v]=${$voiceshash{$ry_bank[$a][$v]}}[0];
-            $ry_att[$a][$v]='0';
-        }
-        $ry_mod[$a]='0';
-        $ry_bal[$a]='0';
-        $ry_flt[$a]='0';
-        $ry_pan[$a]='0';
-        $ry_dcy[$a]='0';
-        $ry_vol[$a]='0';
-        $ry_pbd[$a]='0';
-        $ry_kyo[$a]='0';
-    }
 }
 
 # Refresh a rhythm kit editor voices pulldown list
