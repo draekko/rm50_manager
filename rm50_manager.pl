@@ -444,6 +444,22 @@ my $data_card=$datacards[0];
 # Initial waveform sources
 my @wsources=('Preset', 'IntRAM');
 
+# Rhythm Kits
+my @rykit=('Preset', 'Internal');
+
+my @int_kit=(); for (my $nr=1; $nr<=64; $nr++) { $int_kit[$nr-1]=(sprintf("%02d",$nr)).':UserRhyKit'; }
+
+my @pre_kit=('01:Rock 1', '02:Rock 2', '03:Rock 3', '04:Studio 1', '05:Studio 2', '06:Metal', '07:Pop 1', '08:Pop 2',
+             '09:Country', '10:LatinRock', '11:LatinPerc', '12:Brazil', '13:Funk', '14:R&B 1', '15:R&B 2', '16:JazzBig',
+             '17:JazzSmall', '18:JazzBrush', '19:Dance 1', '20:Dance 2', '21:House 1', '22:House 2', '23:Rap', '24:MouthKit',
+             '25:Hip Hop', '26:World 1', '27:World 2', '28:Gated 1', '29:Gated 2', '30:Fusion 1', '31:Fusion 2', '32:Reggae 1',
+             '33:Reggae 2', '34:Techno 1', '35:Techno 2', '36:Analog 1', '37:Analog 2', '38:Reverb', '39:Stadium', '40:SfxKit 1',
+             '41:SfxKit 2', '42:G MIDI', '43:YAMAHA RX', '44:Dry Zone 1', '45:Dry Zone 2', '46:RoomZone 1', '47:RoomZone 2', '48:RevZone 1',
+             '49:RevZone 2', '50:Kicks 1', '51:Kicks 2', '52:Kicks 3', '53:Snares 1', '54:Snares 2', '55:Snares 3', '56:Toms 1',
+             '57:Toms 2', '58:Toms 3', '59:Cymbals 1', '60:Cymbals 2', '61:Perc 1', '62:Perc 2', '63:SpecialFX1', '64:FX/ Stacks');
+
+my %kithash=('Preset' => \@pre_kit, 'Internal' => \@int_kit, 'Card' => \@int_kit);
+
 # array mapping MIDI note numbers 35-83 to notes B0-B4
 my @note;
 my @keys=('C ', 'C#', 'D ', 'D#', 'E ', 'F ', 'F#', 'G ', 'G#', 'A ', 'A#', 'B ');
@@ -510,6 +526,12 @@ my @ry_dcy;
 my @ry_vol;
 my @ry_pbd;
 my @ry_kyo;
+# rhythm kit download frame
+my $rybank_dwn_sel;
+my $rykit_dwn_sel;
+my $rykitdwn_btn;
+my $selected_rybank='Preset';
+my $selected_rykit=${kithash{$selected_rybank}}[0];
 # default Rhythm Kit number (1-64)
 my $dest_rynr=1;
 # default MIDI channel for playing Rhythm Kit
@@ -744,12 +766,12 @@ sub SaveSettings {
     $cfg->param('Wave_Card2', "$wave_card[2]");
     $cfg->param('Wave_Card3', "$wave_card[3]");
     $cfg->param('Data_Card', "$data_card");
-    $cfg->save('rm50_manager.ini') or Error($cfg->error());
+    $cfg->save('rm50_manager.ini') or Error(\$mw,$cfg->error());
 }
 
 # Read saved default settings from config file
 sub ReadSettings {
-    $cfg->read('rm50_manager.ini') or Error($cfg->error());
+    $cfg->read('rm50_manager.ini') or Error(\$mw,$cfg->error());
     # restore RM50 device number
     if ($cfg->param('RM50_Dev_Nr')             &&
         $cfg->param('RM50_Dev_Nr')=~/^[0-9]+$/ &&
@@ -779,7 +801,7 @@ sub ReadSettings {
             }
         }
         if ($in_pre == 0) {
-            Error('Default MIDI IN device '. $cfg->param('MIDI_IN') .' not available, check connections.');
+            Error(\$mw,'Default MIDI IN device '. $cfg->param('MIDI_IN') .' not available, check connections.');
         }
     }
     # restore MIDI OUT config
@@ -793,7 +815,7 @@ sub ReadSettings {
             }
         }
         if ($out_pre == 0) {
-            Error('Default MIDI OUT device '. $cfg->param('MIDI_OUT') .' not available, check connections.');
+            Error(\$mw,'Default MIDI OUT device '. $cfg->param('MIDI_OUT') .' not available, check connections.');
         }
     }
     # restore data card config 
@@ -831,7 +853,7 @@ sub loadFile {
             close $fh;
             my $check=SysexValidate($tmp_dump);
             if ($check ne 'ok') {
-                Error("Error while opening $syx_file\n\n$check");
+                Error(\$mw,"Error while opening $syx_file\n\n$check");
             } else {
                 $sysex_dump=$tmp_dump;
                 SysexRead();
@@ -839,7 +861,7 @@ sub loadFile {
                 $filename=$syx_file;
             }
         } elsif ($syx_file) {
-            Error("Error: could not open $syx_file");
+            Error(\$mw,"Error: could not open $syx_file");
         }
     }
 }
@@ -858,13 +880,13 @@ sub loadKit {
             close $fh;
             my $check=RySyxValidate(\$tmp_dump);
             if ($check ne 'ok') {
-                Error("Error while opening $syx_file\n\n$check");
+                Error(\$rywin,"Error while opening $syx_file\n\n$check");
             } else {
                 RySyxRead(\$tmp_dump);
                 $ryfilename=$syx_file;
             }
         } elsif ($syx_file) {
-            Error("Error: could not open $syx_file");
+            Error(\$rywin,"Error: could not open $syx_file");
         }
 }
 
@@ -891,7 +913,7 @@ sub saveasFile {
     if ($syx_file) {
         my $fh;
         unless (open $fh, '>', $syx_file) {
-            Error("Error: cannot save to file $syx_file\nCheck filesystem permissions.");
+            Error(\$mw,"Error: cannot save to file $syx_file\nCheck filesystem permissions.");
             return;
         }
         SysexWrite();
@@ -915,7 +937,7 @@ sub saveasKit {
     if ($syx_file) {
         my $fh;
         unless (open $fh, '>', $syx_file) {
-            Error("Error: cannot save to file $syx_file\nCheck filesystem permissions.");
+            Error(\$rywin,"Error: cannot save to file $syx_file\nCheck filesystem permissions.");
             return;
         }
         RySyxWrite(\$ry_syx_dump);
@@ -932,7 +954,7 @@ sub saveFile {
     if ($filename ne '') {
         my $fh;
         unless (open $fh, '>', $filename) {
-            Error("Error: cannot save to file $filename\nCheck filesystem permissions.");
+            Error(\$mw,"Error: cannot save to file $filename\nCheck filesystem permissions.");
             return;
         }
         SysexWrite();
@@ -951,7 +973,7 @@ sub saveKit {
     if ($ryfilename ne '') {
         my $fh;
         unless (open $fh, '>', $ryfilename) {
-            Error("Error: cannot save to file $ryfilename\nCheck filesystem permissions.");
+            Error(\$rywin,"Error: cannot save to file $ryfilename\nCheck filesystem permissions.");
             return;
         }
         RySyxWrite(\$ry_syx_dump);
@@ -1006,10 +1028,12 @@ sub About {
 
 # Error popup window
 sub Error {
-    $mw->messageBox(
+    my $win=$_[0];
+    my $msg=$_[1];
+    ${$win}->messageBox(
         -title   =>'Error',
         -icon    => 'warning',
-        -message =>"$_[0]",
+        -message =>"$msg",
         -type    =>'Ok',
         -default =>'Ok'
     );
@@ -1075,14 +1099,26 @@ sub RySyxRead {
 
         my %ryhashbanks= reverse %rybankshash;
         $ry_bank[$elm][0]=$ryhashbanks{((Syx2Dec($dmp,78+$e)%16)*2+int((Syx2Dec($dmp,80+$e)%256)/128))*2};
-        $ry_voice[$elm][0]=${$ryvoiceshash{$ry_bank[$elm][0]}}[(Syx2Dec($dmp,80+$e)%128)];
+        if (exists $ryvoiceshash{$ry_bank[$elm][0]}) {
+            $ry_voice[$elm][0]=${$ryvoiceshash{$ry_bank[$elm][0]}}[(Syx2Dec($dmp,80+$e)%128)];
+        } else {
+            Error(\$rywin,"Error: Voice 1 of note $notesl[$elm-1] requires a card in slot $ry_bank[$elm][0]. Setting voice to OFF.");
+            $ry_bank[$elm][0]='OFF';
+            $ry_voice[$elm][0]=${$ryvoiceshash{$ry_bank[$elm][0]}}[0];
+        }
 
         # second voice for first 24 notes
         if ($elm<=24) {
             my $o=(4*($elm-1));
             $ry_att[$elm][1]=int((Syx2Dec($dmp,370+$o)%256)/16);
             $ry_bank[$elm][1]=$ryhashbanks{((Syx2Dec($dmp,370+$o)%16)*2+int((Syx2Dec($dmp,372+$o)%256)/128))*2};
-            $ry_voice[$elm][1]=${$ryvoiceshash{$ry_bank[$elm][1]}}[(Syx2Dec($dmp,372+$o)%128)];
+            if (exists $ryvoiceshash{$ry_bank[$elm][1]}) {
+                $ry_voice[$elm][1]=${$ryvoiceshash{$ry_bank[$elm][1]}}[(Syx2Dec($dmp,372+$o)%128)];
+            } else {
+                Error(\$rywin,"Error: Voice 2 of note $notesl[$elm-1] requires a card in slot $ry_bank[$elm][1]. Setting voice to OFF.");
+                $ry_bank[$elm][1]='OFF';
+                $ry_voice[$elm][1]=${$ryvoiceshash{$ry_bank[$elm][1]}}[0];
+            }
         }
     }
 }
@@ -1183,9 +1219,9 @@ sub SysexRead {
                 # print STDERR "Element [".$elm."] uses card [".$card."].\n";
             } elsif ($card) {
                 $wave_source[$elm]=$card;
-                Error("Error: card $card needed by Element $elm of this voice is not inserted, please insert it.");
+                Error(\$mw,"Error: card $card needed by Element $elm of this voice is not inserted, please insert it.");
             } else {
-                Error("Error: card ID# $idnr for Element $elm of this voice is unknown. Using waveform from preset bank instead.");
+                Error(\$mw,"Error: card ID# $idnr for Element $elm of this voice is unknown. Using waveform from preset bank instead.");
             }
         }
         # values: 0..132 (Preset), 0..31 (Wave Card), 0..63 (Wave RAM), 255 off
@@ -1418,7 +1454,7 @@ sub SysexValidate {
     my $tmp_dump=$_[0];
     # check length
     my $dump_len=length($tmp_dump);
-    $dump_len==178 or return "incorrect sysex length";
+    $dump_len==178 or return "incorrect sysex length ($dump_len bytes)";
     # check correct header, footer and valid content
     $tmp_dump=~/^\xF0\x43[\x00-\x0F]\x7A\x01\x2ALM  0087VC\x00{15}[\x00-\x7F]{146}\xF7$/ or return "invalid sysex data";
     # calculate checksum
@@ -1436,7 +1472,7 @@ sub RySyxValidate {
     my $ref_dump=$_[0];
     # check length
     my $dump_len=length(${$ref_dump});
-    $dump_len==468 or return "incorrect sysex length";
+    $dump_len==468 or return "incorrect sysex length ($dump_len bytes)";
     # check correct header, footer and valid content
     ${$ref_dump}=~/^\xF0\x43[\x00-\x0F]\x7A\x03\x4CLM  0087KT\x00{15}[\x00-\x7F]{436}\xF7$/ or return "invalid sysex data";
     # calculate checksum
@@ -1484,7 +1520,7 @@ sub SendWvChMsg {
     elsif ($wave_card[1]=~/^$wave_source[$elm]:.*/) { $tmp=32; }
     elsif ($wave_card[2]=~/^$wave_source[$elm]:.*/) { $tmp=40; }
     elsif ($wave_card[3]=~/^$wave_source[$elm]:.*/) { $tmp=48; }
-    else { Error("Error: waveform card $wave_source[$elm] used by Element $elm not inserted!\n\nPlease insert card into one of the slots."); }
+    else { Error(\$mw,"Error: waveform card $wave_source[$elm] used by Element $elm not inserted!\n\nPlease insert card into one of the slots."); }
     SendPaChMsg($elm+1,0,(int(($wavnr-1)/128)+$tmp),($wavnr-1)%128);
 }
 
@@ -1559,17 +1595,19 @@ sub InsRemWavCard {
             UpdateWSel($elm, 0);
         }
     }
-    # refresh download bank list adding/removing wave slots
+    # refresh download bank list and rhythm kit bank list adding/removing wave slots
     my ($card)=$wave_card[$cardnr]=~/^([a-z,A-Z,0-9]+):.*/;
 
     if ($wave_card[$cardnr] eq ' -- empty slot -- ') {
         delete $voiceshash{"W-S$cardnr"};
+        delete $ryvoiceshash{"W-S$cardnr"};
         if ($selected_bank eq "W-S$cardnr") {
             $selected_bank="I-MX";
             RefreshVceDwnList();
         }
     } elsif ($wave_card[$cardnr]=~/^[a-z,A-Z,0-9]+:.*/) {
         %voiceshash=(%voiceshash, "W-S$cardnr"=>$wvevcehash{$card});
+        %ryvoiceshash=(%ryvoiceshash, "W-S$cardnr"=>$wvevcehash{$card});
         if ($selected_bank eq "W-S$cardnr") {
             RefreshVceDwnList();
         }
@@ -1578,7 +1616,7 @@ sub InsRemWavCard {
 }
 
 # called when Data Card selection is changed
-sub InsRemDatCard {
+sub InsRemDatCard { 
     # no data card inserted
     if ($data_card eq $datacards[0]) {
         delete @voiceshash{keys %crdvcehash};
@@ -1617,11 +1655,18 @@ sub RefreshBnkDwnList {
     $bank_dwn_sel->insert("end", $_) for (@banks_array);
 }
 
-sub RefreshVceDwnList {
+sub RefreshVceDwnList { 
     $voice_dwn_sel->delete( 0, "end" );
     $voice_dwn_sel->insert("end", $_) for (@{$voiceshash{$selected_bank}});
     $selected_voice=${$voiceshash{$selected_bank}}[0];
 }
+
+sub RefreshKitDwnList {
+    $rykit_dwn_sel->delete( 0, "end" );
+    $rykit_dwn_sel->insert("end", $_) for (@{$kithash{$selected_rybank}});
+    $selected_rykit=${$kithash{$selected_rybank}}[0];
+}
+
 # create an array of available midi ports
 sub MidiPortList {
     if ($LINUX) {
@@ -1711,7 +1756,7 @@ sub RM50toPCSyxDmp {
             my @alsaevent=MIDI::ALSA::input();
             # if the input connection has disappeared then exit
             if ( $alsaevent[0] == SND_SEQ_EVENT_PORT_UNSUBSCRIBED() ) {
-                Error("Error: MIDI connection dropped.");
+                Error(\$mw,"Error: MIDI connection dropped.");
                 return '';
             }
             # if we have received a sysex input event then do this
@@ -1745,7 +1790,23 @@ sub RcvSnglVceDmp {
             $filename='';
             return 0;
         } else {
-            Error("Error: $result");
+            Error(\$mw,"Error: $result");
+            return 1;
+        }
+}
+
+# request, receive and validate a single kit dump
+sub RcvSnglKitDmp {
+    my $sbank=$_[0];
+    my $snr=$_[1];
+    my $tmp_dump=RM50toPCSyxDmp(8, $sbank, $snr);
+    my $result=RySyxValidate(\$tmp_dump);
+        if ($result eq 'ok') {
+            RySyxRead(\$tmp_dump);
+            $ryfilename='';
+            return 0;
+        } else {
+            Error(\$rywin,"Error: $result");
             return 1;
         }
 }
@@ -1756,10 +1817,12 @@ sub RefreshVceList {
     my $v=$_[1];
     my $reset=$_[2];
     $ry_voice_sel[$a][$v]->delete( 0, "end" );
-    $ry_voice_sel[$a][$v]->insert("end", $_) for (@{$ryvoiceshash{$ry_bank[$a][$v]}});
-    if ($reset) {
-        $ry_voice[$a][$v]=${$ryvoiceshash{$ry_bank[$a][$v]}}[0];
-        SendVcChMsg($a, $v);
+    if (exists $ryvoiceshash{$ry_bank[$a][$v]}) {
+        $ry_voice_sel[$a][$v]->insert("end", $_) for (@{$ryvoiceshash{$ry_bank[$a][$v]}});
+        if ($reset) {
+            $ry_voice[$a][$v]=${$ryvoiceshash{$ry_bank[$a][$v]}}[0];
+            SendVcChMsg($a, $v);
+        }
     }
 }
 
@@ -1767,6 +1830,7 @@ sub RefreshVceList {
 sub RefreshBnkList {
     my $a=$_[0];
     my $v=$_[1];
+    
     @rybanks_array=(sort(keys(%ryvoiceshash)));
     $ry_bank_sel[$a][$v]->delete( 0, "end" );
     $ry_bank_sel[$a][$v]->insert("end", $_) for (@rybanks_array);
@@ -1796,8 +1860,88 @@ sub KitEditWin {
                       ['command'=>'Close',       -accelerator=>'Ctrl+C',  -command=>[$rywin=>'destroy'] ]]
     )->pack(-side=>"left");
 
-    my $tb=$rywin->Frame(
+    my $fb=$rywin->Frame(
     )->pack(-anchor=>'n', -fill=>'x');
+
+    $fb->Button(
+        -font         => 'Sans 9',
+        -text         => 'Ch Setup',
+        -pady         => 0,
+        -command      => sub{ SendGenPaChMsg(1,0,0,$ry_ch-1,0,0,0);
+                              SendGenPaChMsg(1,0,0,$ry_ch-1,1,1,$dest_rynr-1); }
+    )->pack(-side=>"left", -pady=>4);
+
+    # Rhythmn Kit Number
+    $fb->Label(
+        -text               => '     Internal Bank Destination Kit Nr:',
+        -font               => 'Sans 9',
+        -pady               => 4
+    )->pack(-side=>"left");
+    $fb->Spinbox(%Entry_defaults,
+        -width              => 3,
+        -font               => 'Sans 9',
+        -from               => 1,
+        -to                 => 64,
+        -increment          => 1,
+        -state              => 'readonly',
+        -readonlybackground => $LCDbg,
+        -textvariable       => \$dest_rynr
+    )->pack(-side=>"left");
+
+    # Download Rythm Kit
+    $fb->Label(
+        -text         => '     Rhythm Kit Download from RM50:   Bank:',
+        -font         => 'Sans 9',
+        -justify      => 'right',
+        -anchor       => 'e'
+    )->pack(-side=>"left");
+
+    $rybank_dwn_sel=$fb->BrowseEntry(%BEntry_defaults,
+        -variable     => \$selected_rybank,
+        -choices      => \@rykit,
+        -font         => 'Sans 9',
+        -width        => 8,
+        -listheight   => 4,
+        -browsecmd    => sub{ RefreshKitDwnList(); }
+    )->pack(-side=>"left", -padx=>4);
+
+    $rybank_dwn_sel->Subwidget("choices")->configure(%choices_defaults);
+    $rybank_dwn_sel->Subwidget("arrow")->configure(%arrow_defaults);
+
+    $fb->Label(
+        -text         => " Voice:",
+        -font         => 'Sans 9',
+        -justify      => 'right',
+        -anchor       => 'e'
+    )->pack(-side=>"left");
+
+    $rykit_dwn_sel=$fb->BrowseEntry(%BEntry_defaults,
+        -variable     => \$selected_rykit,
+        -choices      => $kithash{$selected_rybank},
+        -font         => 'Sans 9',
+        -width        => 13,
+        -listheight   => 10
+    )->pack(-side=>"left", -padx=>4);
+
+    $rykit_dwn_sel->Subwidget("choices")->configure(%choices_defaults);
+    $rykit_dwn_sel->Subwidget("arrow")->configure(%arrow_defaults);
+
+    $rykitdwn_btn=$fb->Button(
+        -font         => 'Sans 9',
+        -text         => 'Download',
+        -pady         => 0,
+        -command      => sub{ my ($kitnr)=($selected_rykit=~/^(\d+):.*/);
+                              my $banknr=0; if ($selected_rybank eq 'Internal') { $banknr=2; }
+                                         elsif ($selected_rybank eq 'Card')     { $banknr=4; }
+                              RcvSnglKitDmp($banknr, $kitnr-1); }
+    )->pack(-side=>"left", -padx=>4, -pady=>4);
+
+    if (($midi_indev eq '') || ($midi_outdev eq '')) { $rykitdwn_btn->configure(-state=>'disabled'); }
+
+
+    my $tb=$rywin->Frame(%Frame_defaults
+    )->pack(-anchor=>'n', -fill=>'x');
+
     # MIDI channel
     $tb->Label(
         -text               => ' Ch:',
@@ -1830,23 +1974,6 @@ sub KitEditWin {
         -textvariable       => \$kit_name
     )->pack(-side=>"left");
 
-    # Rhythmn Kit Number
-    $tb->Label(
-        -text               => ' Kit Nr:',
-        -font               => 'Sans 9',
-        -pady               => 4
-    )->pack(-side=>"left");
-    $tb->Spinbox(%Entry_defaults,
-        -width              => 3,
-        -font               => 'Sans 9',
-        -from               => 1,
-        -to                 => 64,
-        -increment          => 1,
-        -state              => 'readonly',
-        -readonlybackground => $LCDbg,
-        -textvariable       => \$dest_rynr
-    )->pack(-side=>"left");
-
     # Pitch Bend Range
     $tb->Label(
         -text               => ' P.B Range:',
@@ -1870,7 +1997,7 @@ sub KitEditWin {
     for (my $tr=1; $tr<=6; $tr++) {
             my $trg=$tr;
             $tb->Label(
-                -text         => " Tr$tr:",
+                -text         => "  Trig$tr:",
                 -font         => 'Sans 9'
             )->pack(-side=>"left");
             $ry_trig[$tr]=$tb->BrowseEntry(%BEntry_defaults,
