@@ -429,7 +429,7 @@ my %wavehash=( 'Preset'  => \@waves,   'IntRAM'  => \@WaveRAM,
 
 # Each Waveform card has a unique ID
 my %waveid=(
-    'RSC3001' => '', 'RSC3002' => '', 'RSC3003' => '', 'RSC3004' => '',
+    'RSC3001' => 11, 'RSC3002' => 12, 'RSC3003' => 15, 'RSC3004' => '',
     'RSC3071' => 17, 'RSC3072' => 18, 'RSC3073' => 19, 'RSC3074' => 20,
     'W7701'   =>  3, 'W7702'   =>  2, 'W7704'   =>  7, 'W7705'   => '',
     'W7731'   =>  6, 'W7732'   => '', 'W7751'   =>  4, 'W7752'   => '' );
@@ -449,14 +449,17 @@ my @rykit=('Preset', 'Internal');
 
 my @int_kit=(); for (my $nr=1; $nr<=64; $nr++) { $int_kit[$nr-1]=(sprintf("%02d",$nr)).':UserRhyKit'; }
 
-my @pre_kit=('01:Rock 1', '02:Rock 2', '03:Rock 3', '04:Studio 1', '05:Studio 2', '06:Metal', '07:Pop 1', '08:Pop 2',
-             '09:Country', '10:LatinRock', '11:LatinPerc', '12:Brazil', '13:Funk', '14:R&B 1', '15:R&B 2', '16:JazzBig',
-             '17:JazzSmall', '18:JazzBrush', '19:Dance 1', '20:Dance 2', '21:House 1', '22:House 2', '23:Rap', '24:MouthKit',
-             '25:Hip Hop', '26:World 1', '27:World 2', '28:Gated 1', '29:Gated 2', '30:Fusion 1', '31:Fusion 2', '32:Reggae 1',
-             '33:Reggae 2', '34:Techno 1', '35:Techno 2', '36:Analog 1', '37:Analog 2', '38:Reverb', '39:Stadium', '40:SfxKit 1',
-             '41:SfxKit 2', '42:G MIDI', '43:YAMAHA RX', '44:Dry Zone 1', '45:Dry Zone 2', '46:RoomZone 1', '47:RoomZone 2', '48:RevZone 1',
-             '49:RevZone 2', '50:Kicks 1', '51:Kicks 2', '52:Kicks 3', '53:Snares 1', '54:Snares 2', '55:Snares 3', '56:Toms 1',
-             '57:Toms 2', '58:Toms 3', '59:Cymbals 1', '60:Cymbals 2', '61:Perc 1', '62:Perc 2', '63:SpecialFX1', '64:FX/ Stacks');
+my @pre_kit=('01:Rock 1',     '02:Rock 2',     '03:Rock 3',     '04:Studio 1',   '05:Studio 2',   '06:Metal',
+             '07:Pop 1',      '08:Pop 2',      '09:Country',    '10:LatinRock',  '11:LatinPerc',  '12:Brazil',
+             '13:Funk',       '14:R&B 1',      '15:R&B 2',      '16:JazzBig',    '17:JazzSmall',  '18:JazzBrush',
+             '19:Dance 1',    '20:Dance 2',    '21:House 1',    '22:House 2',    '23:Rap',        '24:MouthKit',
+             '25:Hip Hop',    '26:World 1',    '27:World 2',    '28:Gated 1',    '29:Gated 2',    '30:Fusion 1',
+             '31:Fusion 2',   '32:Reggae 1',   '33:Reggae 2',   '34:Techno 1',   '35:Techno 2',   '36:Analog 1',
+             '37:Analog 2',   '38:Reverb',     '39:Stadium',    '40:SfxKit 1',   '41:SfxKit 2',   '42:G MIDI',
+             '43:YAMAHA RX',  '44:Dry Zone 1', '45:Dry Zone 2', '46:RoomZone 1', '47:RoomZone 2', '48:RevZone 1',
+             '49:RevZone 2',  '50:Kicks 1',    '51:Kicks 2',    '52:Kicks 3',    '53:Snares 1',   '54:Snares 2',
+             '55:Snares 3',   '56:Toms 1',     '57:Toms 2',     '58:Toms 3',     '59:Cymbals 1',  '60:Cymbals 2',
+             '61:Perc 1',     '62:Perc 2',     '63:SpecialFX1', '64:FX/ Stacks');
 
 my %kithash=('Preset' => \@pre_kit, 'Internal' => \@int_kit, 'Card' => \@int_kit);
 
