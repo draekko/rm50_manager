@@ -428,11 +428,12 @@ my %wavehash=( 'Preset'  => \@waves,   'IntRAM'  => \@WaveRAM,
     'W7731'   => \@W7731,   'W7732'   => \@W7732,   'W7751'   => \@W7751,   'W7752'   => \@W7752 );
 
 # Each Waveform card has a unique ID
+# SY55/TG55 Waveform cards (W55XX) use the same ID as equivalent SY77/TG77 cards
 my %waveid=(
-    'RSC3001' => 11, 'RSC3002' => 12, 'RSC3003' => 15, 'RSC3004' => '',
+    'RSC3001' => 11, 'RSC3002' => 12, 'RSC3003' => 15, 'RSC3004' => 10,
     'RSC3071' => 17, 'RSC3072' => 18, 'RSC3073' => 19, 'RSC3074' => 20,
-    'W7701'   =>  3, 'W7702'   =>  2, 'W7704'   =>  7, 'W7705'   => '',
-    'W7731'   =>  6, 'W7732'   => '', 'W7751'   =>  4, 'W7752'   => '' );
+    'W7701'   =>  3, 'W7702'   =>  2, 'W7704'   =>  7, 'W7705'   =>  0,
+    'W7731'   =>  6, 'W7732'   => '', 'W7751'   =>  4, 'W7752'   =>  9 );
 
 # Inserted Wave Cards (default to empty slots)
 my @wave_card=('', $wavecards[0], $wavecards[0], $wavecards[0]);
@@ -2063,7 +2064,10 @@ sub KitEditWin {
         $ryw->Button(
             -font         => 'title',
             -textvariable => \$note[$a+34],
-            -command      => sub{ if ($LINUX) { MIDI::ALSA::output(MIDI::ALSA::noteevent($ry_ch-1,$nn+34,127,0,1)); } }
+            -command      => sub{ if ($LINUX) { MIDI::ALSA::output(MIDI::ALSA::noteevent($ry_ch-1,$nn+34,127,0,1));
+                                  } elsif ($WINDOWS) {   # add Windows specific code here 
+                                  } 
+                                }
         )->grid(-row=>$a, -column=>0, -padx=>4, -sticky=>'nsew');
         for (my $v=0; $v<=$end; $v++) {
             my $aa=$a; my $vv=$v;
