@@ -1626,12 +1626,17 @@ sub InsRemDatCard {
             $selected_bank="I-MX";
             RefreshVceDwnList();
         }
+        splice(@rykit,2,1);
+        $selected_rybank=$rykit[0];
+        if (Exists($rywin)) { RefreshKitBnkDwnList(); RefreshKitDwnList(); }
     }
     # MCD32 data card inserted (only 1 bank)
     elsif ($data_card eq $datacards[1]) {
         %voiceshash=(%voiceshash, %crdvcehash);
         %ryvoiceshash=(%ryvoiceshash, %crdvcehash);
         RefreshBnkDwnList();
+        $rykit[2]='Card';
+        if (Exists($rywin)) { RefreshKitBnkDwnList(); RefreshKitDwnList(); }
     }
     # MCD64 data card inserted using bank 1
     elsif ($data_card eq $datacards[2]) {
@@ -1639,6 +1644,8 @@ sub InsRemDatCard {
         %voiceshash=(%voiceshash, %crdvcehash);
         %ryvoiceshash=(%ryvoiceshash, %crdvcehash);
         RefreshBnkDwnList();
+        $rykit[2]='Card';
+        if (Exists($rywin)) { RefreshKitBnkDwnList(); RefreshKitDwnList(); }
     }
     # MCD64 data card inserted using bank 2
     elsif ($data_card eq $datacards[3]) {
@@ -1646,6 +1653,8 @@ sub InsRemDatCard {
         %voiceshash=(%voiceshash, %crdvcehash);
         %ryvoiceshash=(%ryvoiceshash, %crdvcehash);
         RefreshBnkDwnList();
+        $rykit[2]='Card';
+        if (Exists($rywin)) { RefreshKitBnkDwnList(); RefreshKitDwnList(); }
     }
 }
 
@@ -1653,6 +1662,11 @@ sub RefreshBnkDwnList {
     @banks_array=(sort(keys(%voiceshash)));
     $bank_dwn_sel->delete( 0, "end" );
     $bank_dwn_sel->insert("end", $_) for (@banks_array);
+}
+
+sub RefreshKitBnkDwnList {
+    $rybank_dwn_sel->delete( 0, "end" );
+    $rybank_dwn_sel->insert("end", $_) for (@rykit);
 }
 
 sub RefreshVceDwnList { 
@@ -1712,13 +1726,17 @@ sub MidiConSetup {
     }
     if (($midi_indev ne '') && ($midi_outdev ne '')) {
         $vcdwn_btn->configure(-state=>'active');
+        if (Exists($rywin)) { $rykitdwn_btn->configure(-state=>'active'); }
     } else {
         $vcdwn_btn->configure(-state=>'disabled');
+        if (Exists($rywin)) { $rykitdwn_btn->configure(-state=>'disabled'); }
     }
     if ($midi_outdev ne '') {
         $midiupload->configure(-state=>'active');
+        if (Exists($rywin)) { $rymidiupload->configure(-state=>'active'); }
     } else {
         $midiupload->configure(-state=>'disabled');
+        if (Exists($rywin)) { $rymidiupload->configure(-state=>'disabled'); }
     }
 }
 
@@ -1804,6 +1822,7 @@ sub RcvSnglKitDmp {
         if ($result eq 'ok') {
             RySyxRead(\$tmp_dump);
             $ryfilename='';
+            if ($sbank == 2) { $dest_rynr=$snr+1; }
             return 0;
         } else {
             Error(\$rywin,"Error: $result");
@@ -1938,8 +1957,10 @@ sub KitEditWin {
 
     if (($midi_indev eq '') || ($midi_outdev eq '')) { $rykitdwn_btn->configure(-state=>'disabled'); }
 
+    my $line=$rywin->Frame(%Frame_defaults, -height=>2
+    )->pack(-anchor=>'n', -fill=>'x');
 
-    my $tb=$rywin->Frame(%Frame_defaults
+    my $tb=$rywin->Frame(
     )->pack(-anchor=>'n', -fill=>'x');
 
     # MIDI channel
