@@ -320,30 +320,30 @@ my @CMX_voices=(); for (my $nr=1; $nr<=128; $nr++) { $CMX_voices[$nr-1]=(sprintf
 # RSC3001 Percussion card voice names
 my @RSC3001_voices=(
     '01:L.Bg Slp', '02:Cabasa',   '03:Cuica Lo', '04:Pandiero', '05:ShekereD', '06:TemplBlk', '07:H.Bg Slp', '08:Castanet', 
-    '09:MaracasD', '10:RiceShk',  '11:ShekereT', '12:Surdo',    '13:Tamborim', '14:Tabla Lo', '15:Caxixi L', '16:TimbalRl',
+    '09:MaracasD', '10:Rice Shk', '11:ShekereT', '12:Surdo',    '13:Tamborim', '14:Tabla Lo', '15:Caxixi L', '16:TimbalRl',
     '17:Timpani',  '18:Clap 2',   '19:TalkDr L', '20:Tabla Hi', '21:Caxixi H', '22:Timbal H', '23:Timbal L', '24:Clap 3',
     '25:TalkDr H', '26:Cuica Hi', '27:AnaCowbl', '28:TimPaira', '29:Tambdiro', '30:Squeeze',  '31:Vibraslp', '32:Den Den' );
 
 # RSC3002 FX Drums card voice names
-my @RSC3002_voices=(
-    '01:SwishHat', '02:SwishWnd', '03:BigDoor',  '04:MotorSnr', '05:BuickKik', '06:Beater',   '07:Growler',  '08:ShokClap',
-    '09:MtlBongo', '10:MTLonMTL', '11:RicoTom',  '12:SnareAir', '13:DarkTom',  '14:WhaBongo', '15:UpSplash', '16:TomsFlor',
-    '17:TubeArgh', '18:SnapESnr', '19:CANtoCAN', '20:TinyGong', '21:PitchMtl', '22:MtlFence', '23:BigShot',  '24:Ringer',
-    '25:Scratch',  '26:Them',     '27:CannonSn', '28:Whales',   '29:EastPerc', '30:FlyBy',    '31:ShockHat', '32:FrogDrum' );
+my @RSC3002_voices=qw(
+    01:SwishHat  02:SwishWnd  03:BigDoor   04:MotorSnr  05:BuickKik  06:Beater    07:Growler   08:ShokClap
+    09:MtlBongo  10:MTLonMTL  11:RicoTom   12:SnareAir  13:DarkTom   14:WhaBongo  15:UpSplash  16:TomsFlor
+    17:TubeArgh  18:SnapESnr  19:CANtoCAN  20:TinyGong  21:PitchMtl  22:MtlFence  23:BigShot   24:Ringer
+    25:Scratch   26:Them      27:CannonSn  28:Whales    29:EastPerc  30:FlyBy     31:ShockHat  32:FrogDrum );
 
 # RSC3003 House & Rap card voice names
 my @RSC3003_voices=qw(
-    01:  02:  03:  04:  05:  06:  07:  08:
-    09:  10:  11:  12:  13:  14:  15:  16:
-    17:  18:  19:  20:  21:  22:  23:  24:
-    25:  26:  27:  28:  29:  30:  31:  32: );
+    01:KickTite  02:KickDeep  03:KickAmbi  04:KickDirt  05:KickBend  06:KickRoom  07:EfexAaah  08:EfexJung
+    09:EfexNoiz  10:EfexTape  11:EfexItts  12:EfexEizz  13:EfexGlas  14:EfexDaah  15:EfexDaba  16:EfexMetl
+    17:EfexScra  18:EfexGtr!  19:HatsClos  20:HatsOpen  21:PercCaba  22:PercBlok  23:PercFing  24:PercTamb
+    25:PercBlip  26:PercMara  27:SnarHigh  28:SnarLoos  29:SnarDirt  30:SnarTune  31:SnarFlat  32:Snar919! );
 
 # RSC3004 Dance & Soul card voice names
 my @RSC3004_voices=qw(
-    01:  02:  03:  04:  05:  06:  07:  08:
-    09:  10:  11:  12:  13:  14:  15:  16:
-    17:  18:  19:  20:  21:  22:  23:  24:
-    25:  26:  27:  28:  29:  30:  31:  32: );
+    01:KickTite  02:KickAiry  03:KickElec  04:KickFlop  05:KickKlik  06:KickHolo  07:SnarHigh  08:SnarCamo
+    09:SnarKlnk  10:SnarSwat  11:SnarBaby  12:SnarRing  13:HatsCls1  14:HatsCls2  15:HatsCls3  16:HatsOpn1
+    17:RimSnare  18:PercClap  19:PercTamb  20:PercAngl  21:PercMrc1  22:PercMrc2  23:PercShkr  24:PercCabs
+    25:PercSnap  26:PercCRub  27:PercSkin  28:PercBlok  29:EfexGrab  30:EfexNoiz  31:EfexNoyz  32:EfexGtr! );
 
 # RSC3071 Dave Weckl card voice names
 my @RSC3071_voices=(
@@ -354,7 +354,7 @@ my @RSC3071_voices=(
 
 # RSC3072 Tommy Aldridge voice names
 my @RSC3072_voices=(
-    '01:BD1 L', '02:BD1 R',  '03:BD1 Dry',  '04:BD 2',     '05:SD1',      '06:SD2',      '07:SD3',      '08:SD4',
+    '01:BD1 L', '02:BD1 R',  '03:BD1 Dry',  '04:BD2',      '05:SD1',      '06:SD2',      '07:SD3',      '08:SD4',
     '09:SD5',   '10:Foot',   '11:Closed',   '12:Shld Hvy', '13:Open',     '14:Tip/Shld', '15:Tom1',     '16:Tom2',
     '17:Tom3',  '18:Tom4',   '19:Tom5',     '20:Tom6',     '21:Cowbell',  '22:Crash',    '23:China',    '24:Ridebel',
     '25:Ride',  '26:Splash', '27:Pwr Tm 1', '28:Pwr Tm 2', '29:Pwr Tm 3', '30:Pwr Tm 4', '31:Pwr Tm 5', '32:Pwr Tm 6' );
@@ -430,7 +430,7 @@ my %wavehash=( 'Preset'  => \@waves,   'IntRAM'  => \@WaveRAM,
 # Each Waveform card has a unique ID
 # SY55/TG55 Waveform cards (W55XX) use the same ID as equivalent SY77/TG77 cards
 my %waveid=(
-    'RSC3001' => 11, 'RSC3002' => 12, 'RSC3003' => 15, 'RSC3004' => 10,
+    'RSC3001' => 11, 'RSC3002' => 12, 'RSC3003' => 15, 'RSC3004' => 16,
     'RSC3071' => 17, 'RSC3072' => 18, 'RSC3073' => 19, 'RSC3074' => 20,
     'W7701'   =>  3, 'W7702'   =>  2, 'W7704'   =>  7, 'W7705'   =>  0,
     'W7731'   =>  6, 'W7732'   => '', 'W7751'   =>  4, 'W7752'   =>  9 );
