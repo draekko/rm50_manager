@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#  Yamaha RM50 Manager version 0.2
+#  Yamaha RM50 Manager version 1.0
 #
 #  Copyright (C) 2012 LinuxTECH.NET
 #
@@ -21,7 +21,7 @@
 use strict;
 use warnings;
 
-my $version="0.2";
+my $version="1.0";
 
 use Tk;
 use Tk::Pane;
@@ -1390,8 +1390,8 @@ sub newVoice {
         $elm_pitch[$elm] = 0;
         $eg_attack[$elm]  = 0;
         $eg_decay[$elm]   = 63;
-        $eg_release[$elm] = 63;
-        $eg_punch[$elm]   = 1;
+        $eg_release[$elm] = 0;
+        $eg_punch[$elm]   = 0;
         $filter_type[$elm]       = 0;
         $filter_cutoff_frq[$elm] = 127;
         $filter_resonance[$elm]  = 0;
