@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#  Yamaha RM50 Manager version 1.0
+#  Yamaha RM50 Manager version 1.1-beta1
 #
 #  Copyright (C) 2012 LinuxTECH.NET
 #
@@ -21,7 +21,7 @@
 use strict;
 use warnings;
 
-my $version="1.0";
+my $version="1.1-beta1";
 
 use Tk;
 use Tk::Pane;
@@ -839,11 +839,11 @@ sub exitProgam {
     if ($modified == 1) {
         my $rtn=UnsavedChanges('Quit anyway?');
         if ($rtn eq 'Yes') {
-            if ($WINDOWS) { $midiOut->Close(); }
+            if ($WINDOWS && ($midi_outdev ne '')) { $midiOut->Close(); }
             exit;
         }
     } else {
-        if ($WINDOWS) { $midiOut->Close(); }
+        if ($WINDOWS && ($midi_outdev ne '')) { $midiOut->Close(); }
         exit;
     }
 }
@@ -1009,7 +1009,7 @@ sub SysexVceUpload {
     if ($LINUX) {
         MIDI::ALSA::output( MIDI::ALSA::sysex( $dev_nr-1, $ddata, 0 ) );
         MIDI::ALSA::syncoutput();
-    } elsif ($WINDOWS) {
+    } elsif ($WINDOWS && ($midi_outdev ne '')) {
         # fixme: for some weird reason $ddata doesn't work, substr($ddata) is needed
         my $buf="\xF0". substr($ddata,0,length($ddata)) ."\xF7";
         my $midihdr = pack ("PLLLLPLL", $buf, length $buf, 0, 0, 0, undef, 0, 0);
@@ -1029,7 +1029,7 @@ sub SysexRyUpload {
     if ($LINUX) {
         MIDI::ALSA::output( MIDI::ALSA::sysex( $dev_nr-1, $ddata, 0 ) );
         MIDI::ALSA::syncoutput();
-    } elsif ($WINDOWS) {
+    } elsif ($WINDOWS && ($midi_outdev ne '')) {
         # fixme: for some weird reason $ddata doesn't work, substr($ddata) is needed
         my $buf="\xF0". substr($ddata,0,length($ddata)) ."\xF7";
         my $midihdr = pack ("PLLLLPLL", $buf, length $buf, 0, 0, 0, undef, 0, 0);
@@ -1590,7 +1590,7 @@ sub SendGenPaChMsg {
     my $ddata="\x43".chr($dev_nr-1+16)."\x30".$pgroup.$memory.$number.$parm_1.$parm_2.$val_hi.$val_lo;
     if ($LINUX) {
         MIDI::ALSA::output( MIDI::ALSA::sysex( $dev_nr-1, $ddata, 0 ) );
-    } elsif ($WINDOWS) {
+    } elsif ($WINDOWS && ($midi_outdev ne '')) {
         my $buf="\xF0".$ddata."\xF7";
         my $midihdr = pack ("PLLLLPLL", $buf, length $buf, 0, 0, 0, undef, 0, 0);
         my $lpMidiOutHdr = unpack('L!', pack('P', $midihdr));
@@ -1600,20 +1600,21 @@ sub SendGenPaChMsg {
     }
 }
 
-# Play a Note via MIDI (send 'note on' event followed by 'note off' event)
+# Play a Note via MIDI (send 'note on' or 'note off' event)
 sub PlayMidiNote {
     my $ch=$_[0]; # midi channel 0-15
     my $nt=$_[1]; # midi note 0-127
     my $vl=$_[2]; # note velocity 0-127
-    my $du=$_[3]; # note duration floating point seconds
+    my $oo=$_[3]; # note on (1) or note off (0)
     if ($LINUX) {
-        MIDI::ALSA::output(MIDI::ALSA::noteevent($ch,$nt,$vl,0,$du));
-    } elsif ($WINDOWS) {
-        my $onmsg=($vl*65536)+($nt*256)+(144+$ch);
-        my $offmsg=($vl*65536)+($nt*256)+(128+$ch);
-        $midiOut->ShortMsg($onmsg);
-        select(undef,undef,undef,$du);
-        $midiOut->ShortMsg($offmsg);
+        if ($oo) {
+            MIDI::ALSA::output(MIDI::ALSA::noteonevent($ch,$nt,$vl));
+        } else {
+            MIDI::ALSA::output(MIDI::ALSA::noteoffevent($ch,$nt,$vl));
+        }
+    } elsif ($WINDOWS && ($midi_outdev ne '')) {
+        my $msg=($vl*65536)+($nt*256)+(128+$ch+($oo*16));
+        $midiOut->ShortMsg($msg);
     }
 }
 
@@ -2122,11 +2123,14 @@ sub KitEditWin {
         my $end;
         if ($a<=24) { $end=1; } else { $end=0; }
         my $nn=$a;
-        $ryw->Button(
+        # note buttons
+        my $plbt=$ryw->Button(
             -font         => 'title',
             -textvariable => \$note[$a+34],
-            -command      => sub{ PlayMidiNote($ry_ch-1,$nn+34,127,0.25); }
         )->grid(-row=>$a, -column=>0, -padx=>4, -sticky=>'nsew');
+        $plbt->bind('<Button-1>'        => sub { PlayMidiNote($ry_ch-1,$nn+34,127,1); });
+        $plbt->bind('<ButtonRelease-1>' => sub { PlayMidiNote($ry_ch-1,$nn+34,127,0); });
+        # loop for dual voice notes
         for (my $v=0; $v<=$end; $v++) {
             my $aa=$a; my $vv=$v;
             # bank selection
