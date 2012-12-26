@@ -46,12 +46,15 @@ use if ($LINUX), 'MIDI::ALSA' => ('SND_SEQ_EVENT_PORT_UNSUBSCRIBED',
 
 use if ($WINDOWS), 'Win32API::MIDI';
 
-# on Linux initialise ALSA client connection
+# initialise MIDI on Linux and Windows
+my $midi;
+my $midiIn;
+my $midiOut;
 if ($LINUX) {
     MIDI::ALSA::client("RM50 manager PID_$$",1,1,1);
     MIDI::ALSA::start();
 } elsif ($WINDOWS) {
-    # add Windows specific code here
+    $midi = new Win32API::MIDI;
 }
 
 # slider font size: 6 for Linux, 7 for Windows
@@ -481,7 +484,8 @@ my $midi_outdev="";
 my $midi_outdev_prev="";
 my $midi_indev="";
 my $midi_indev_prev="";
-my @midi_devs=MidiPortList();
+my @midi_indevs=MidiPortList('in');
+my @midi_outdevs=MidiPortList('out');
 
 # these widgets need to be global
 my @elm_wave_entry;
@@ -609,6 +613,9 @@ $mw->resizable(0,0);
 $mw->fontCreate('title', -family=>'Sans', -weight=>'bold', -size=>9);
 
 $mw->DefineBitmap('darrow'=>11,10,$darrow_bits);
+
+# catch users pressing the window close button
+$mw->protocol(WM_DELETE_WINDOW => \&exitProgam );
 
 # default font
 $mw->optionAdd('*font', 'Sans 10');
@@ -791,13 +798,14 @@ sub ReadSettings {
         if ($cfg->param("Wave_Card$a")) { $wave_card[$a]=$cfg->param("Wave_Card$a"); InsRemWavCard($a); }
     }
     # rescan MIDI devices for MIDI IN/OUT configuration
-    my @midi_devices=MidiPortList();
+    my @midi_indevices=MidiPortList('in');
+    my @midi_outdevices=MidiPortList('out');
     my $in_pre=0;
     my $out_pre=0;
     # restore MIDI IN config
-    if ( $cfg->param('MIDI_IN') ) {
-        for (my $n=0; $n<@midi_devices; $n++) {
-            if ($midi_devices[$n] eq $cfg->param('MIDI_IN')) {
+    if ($cfg->param('MIDI_IN') && ($cfg->param('MIDI_IN') ne '')) {
+        for (my $n=0; $n<@midi_indevices; $n++) {
+            if ($midi_indevices[$n] eq $cfg->param('MIDI_IN')) {
                 $midi_indev=$cfg->param('MIDI_IN');
                 MidiConSetup('in');
                 $in_pre=1;
@@ -809,9 +817,9 @@ sub ReadSettings {
         }
     }
     # restore MIDI OUT config
-    if ( $cfg->param('MIDI_OUT') ) {
-        for (my $m=0; $m<@midi_devices; $m++) {
-            if ($midi_devices[$m] eq $cfg->param('MIDI_OUT')) {
+    if ($cfg->param('MIDI_OUT') && ($cfg->param('MIDI_OUT') ne '')) {
+        for (my $m=0; $m<@midi_outdevices; $m++) {
+            if ($midi_outdevices[$m] eq $cfg->param('MIDI_OUT')) {
                 $midi_outdev=$cfg->param('MIDI_OUT');
                 MidiConSetup('out');
                 $out_pre=1;
@@ -830,10 +838,12 @@ sub ReadSettings {
 sub exitProgam {
     if ($modified == 1) {
         my $rtn=UnsavedChanges('Quit anyway?');
-        if ($rtn eq 'Yes') { 
+        if ($rtn eq 'Yes') {
+            if ($WINDOWS) { $midiOut->Close(); }
             exit;
         }
     } else {
+        if ($WINDOWS) { $midiOut->Close(); }
         exit;
     }
 }
@@ -997,10 +1007,16 @@ sub SysexVceUpload {
     substr($sysex_dump,176,1,chr($chksum));
     my $ddata=substr($sysex_dump,1,(length($sysex_dump)-2));
     if ($LINUX) {
-        MIDI::ALSA::output( MIDI::ALSA::sysex(0,$ddata,0));
+        MIDI::ALSA::output( MIDI::ALSA::sysex( $dev_nr-1, $ddata, 0 ) );
         MIDI::ALSA::syncoutput();
     } elsif ($WINDOWS) {
-        # add Windows specific code here
+        # fixme: for some weird reason $ddata doesn't work, substr($ddata) is needed
+        my $buf="\xF0". substr($ddata,0,length($ddata)) ."\xF7";
+        my $midihdr = pack ("PLLLLPLL", $buf, length $buf, 0, 0, 0, undef, 0, 0);
+        my $lpMidiOutHdr = unpack('L!', pack('P', $midihdr));
+        $midiOut->PrepareHeader($lpMidiOutHdr);
+        $midiOut->LongMsg($lpMidiOutHdr);
+        $midiOut->UnprepareHeader($lpMidiOutHdr);
     }
 }
 
@@ -1011,10 +1027,16 @@ sub SysexRyUpload {
     substr($ry_syx_dump,466,1,chr($chksum));
     my $ddata=substr($ry_syx_dump,1,(length($ry_syx_dump)-2));
     if ($LINUX) {
-        MIDI::ALSA::output( MIDI::ALSA::sysex(0,$ddata,0));
+        MIDI::ALSA::output( MIDI::ALSA::sysex( $dev_nr-1, $ddata, 0 ) );
         MIDI::ALSA::syncoutput();
     } elsif ($WINDOWS) {
-        # add Windows specific code here
+        # fixme: for some weird reason $ddata doesn't work, substr($ddata) is needed
+        my $buf="\xF0". substr($ddata,0,length($ddata)) ."\xF7";
+        my $midihdr = pack ("PLLLLPLL", $buf, length $buf, 0, 0, 0, undef, 0, 0);
+        my $lpMidiOutHdr = unpack('L!', pack('P', $midihdr));
+        $midiOut->PrepareHeader($lpMidiOutHdr);
+        $midiOut->LongMsg($lpMidiOutHdr);
+        $midiOut->UnprepareHeader($lpMidiOutHdr);
     }
 }
 
@@ -1565,16 +1587,33 @@ sub SendGenPaChMsg {
     my $parm_2=chr($_[4]);
     my $val_hi=chr($_[5]);
     my $val_lo=chr($_[6]);
+    my $ddata="\x43".chr($dev_nr-1+16)."\x30".$pgroup.$memory.$number.$parm_1.$parm_2.$val_hi.$val_lo;
     if ($LINUX) {
-        MIDI::ALSA::output(
-            MIDI::ALSA::sysex(
-                $dev_nr-1,
-                "\x43".chr($dev_nr-1+16)."\x30".$pgroup.$memory.$number.$parm_1.$parm_2.$val_hi.$val_lo,
-                0
-            )
-        );
+        MIDI::ALSA::output( MIDI::ALSA::sysex( $dev_nr-1, $ddata, 0 ) );
     } elsif ($WINDOWS) {
-        # add Windows specific code here
+        my $buf="\xF0".$ddata."\xF7";
+        my $midihdr = pack ("PLLLLPLL", $buf, length $buf, 0, 0, 0, undef, 0, 0);
+        my $lpMidiOutHdr = unpack('L!', pack('P', $midihdr));
+        $midiOut->PrepareHeader($lpMidiOutHdr);
+        $midiOut->LongMsg($lpMidiOutHdr);
+        $midiOut->UnprepareHeader($lpMidiOutHdr);
+    }
+}
+
+# Play a Note via MIDI (send 'note on' event followed by 'note off' event)
+sub PlayMidiNote {
+    my $ch=$_[0]; # midi channel 0-15
+    my $nt=$_[1]; # midi note 0-127
+    my $vl=$_[2]; # note velocity 0-127
+    my $du=$_[3]; # note duration floating point seconds
+    if ($LINUX) {
+        MIDI::ALSA::output(MIDI::ALSA::noteevent($ch,$nt,$vl,0,$du));
+    } elsif ($WINDOWS) {
+        my $onmsg=($vl*65536)+($nt*256)+(144+$ch);
+        my $offmsg=($vl*65536)+($nt*256)+(128+$ch);
+        $midiOut->ShortMsg($onmsg);
+        select(undef,undef,undef,$du);
+        $midiOut->ShortMsg($offmsg);
     }
 }
 
@@ -1687,11 +1726,12 @@ sub RefreshKitDwnList {
 
 # create an array of available midi ports
 sub MidiPortList {
+    my $dir=$_[0];
+    my @portlist;
     if ($LINUX) {
         my %clients = MIDI::ALSA::listclients();
         my %portnrs = MIDI::ALSA::listnumports();
         my $tmp=0;
-        my @portlist;
         while (my ($key, $value) = each(%clients)){
             if ($key>15 && $key<128) {
                 for (my $i=0; $i<($portnrs{$key}); $i++) {
@@ -1700,10 +1740,22 @@ sub MidiPortList {
                 }
             }
         }
-        return @portlist;
     } elsif ($WINDOWS) {
-        # add Windows specific code here
+        if ($dir eq 'in') {
+            my $iNumDevs=$midi->InGetNumDevs();
+            for (my $i=0; $i<$iNumDevs; $i++) {
+                my $cap=$midi->InGetDevCaps($i);
+                $portlist[$i]=$$cap{szPname};
+            }
+        } elsif ($dir eq 'out') {
+            my $oNumDevs=$midi->OutGetNumDevs();
+            for (my $o=0; $o<$oNumDevs; $o++) {
+                my $cap=$midi->OutGetDevCaps($o);
+                $portlist[$o]=$$cap{szPname};
+            }
+        }
     }
+    return @portlist;
 }
 
 # set up a new midi connection and drop the previous one
@@ -1726,7 +1778,16 @@ sub MidiConSetup {
         }
         MIDI::ALSA::start();
     } elsif ($WINDOWS) {
-        # add Windows specific code here
+        if ($dir eq 'out') {
+            if ($midi_outdev_prev ne '') {
+                $midiOut->Close();
+            }
+            $midi_outdev_prev=$midi_outdev;
+            my $dev=$midi->OutGetDevNum($midi_outdev);
+            $midiOut=new Win32API::MIDI::Out($dev);
+        } elsif ($dir eq 'in') {
+            # add Windows specific code here
+        }
     }
     if (($midi_indev ne '') && ($midi_outdev ne '')) {
         $vcdwn_btn->configure(-state=>'active');
@@ -2064,10 +2125,7 @@ sub KitEditWin {
         $ryw->Button(
             -font         => 'title',
             -textvariable => \$note[$a+34],
-            -command      => sub{ if ($LINUX) { MIDI::ALSA::output(MIDI::ALSA::noteevent($ry_ch-1,$nn+34,127,0,1));
-                                  } elsif ($WINDOWS) {   # add Windows specific code here 
-                                  } 
-                                }
+            -command      => sub{ PlayMidiNote($ry_ch-1,$nn+34,127,0.25); }
         )->grid(-row=>$a, -column=>0, -padx=>4, -sticky=>'nsew');
         for (my $v=0; $v<=$end; $v++) {
             my $aa=$a; my $vv=$v;
@@ -3013,20 +3071,20 @@ sub Settings_Frame {
 
     $midiout=$midi_sett_sub->BrowseEntry(%BEntry_defaults,
         -variable     => \$midi_outdev,
-        -choices      => \@midi_devs,
+        -choices      => \@midi_outdevs,
         -font         => 'Sans 9',
         -width        => 28,
         -listheight   => 9,
         -browsecmd    => sub{ MidiConSetup('out'); },
-        -listcmd      => sub{ @midi_devs=MidiPortList();
+        -listcmd      => sub{ @midi_outdevs=MidiPortList('out');
                               $midiout->delete( 0, "end" );
-                              $midiout->insert("end", $_) for (@midi_devs); }
+                              $midiout->insert("end", $_) for (@midi_outdevs); }
     )->grid(-row=>0, -column=>1, -sticky=>'w', -pady=>8);
 
     $midiout->Subwidget("choices")->configure(%choices_defaults);
     $midiout->Subwidget("arrow")->configure(%arrow_defaults);
 
-    if (!$LINUX) { $midiout->configure(-state=>'disabled'); }
+    if (!$LINUX && !$WINDOWS) { $midiout->configure(-state=>'disabled'); }
 
     $midi_sett_sub->Label(
         -text         => "Input MIDI Device from Yamaha RM50: ",
@@ -3036,14 +3094,14 @@ sub Settings_Frame {
 
     $midiin=$midi_sett_sub->BrowseEntry(%BEntry_defaults,
         -variable     => \$midi_indev,
-        -choices      => \@midi_devs,
+        -choices      => \@midi_indevs,
         -font         => 'Sans 9',
         -width        => 28,
         -listheight   => 9,
         -browsecmd    => sub{ MidiConSetup('in'); },
-        -listcmd      => sub{ @midi_devs=MidiPortList();
+        -listcmd      => sub{ @midi_indevs=MidiPortList('in');
                               $midiin->delete( 0, "end" );
-                              $midiin->insert("end", $_) for (@midi_devs); }
+                              $midiin->insert("end", $_) for (@midi_indevs); }
     )->grid(-row=>1, -column=>1, -sticky=>'w', -pady=>8);
 
     $midiin->Subwidget("choices")->configure(%choices_defaults);
