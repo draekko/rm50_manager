@@ -70,8 +70,6 @@ Prerequisites:
   cpan Config::Simple
 
 
-On Windows MIDI support is not implemented yet.
-
 
 
 OS X
