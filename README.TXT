@@ -1,3 +1,9 @@
+'RM50 Manager' is a voice and rhythm kit editor for the Yamaha RM50 rhythm
+sound module. It runs on Linux and Windows and probably also OS X (untested).
+For more info about the Yamaha RM50 see:
+http://www.linuxtech.net/musicgear/synth_yamaha_rm50.html
+
+
 Linux instructions
 ==================
 
