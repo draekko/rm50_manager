@@ -19,7 +19,7 @@ so I can add the waveform names for this card to the RM50 Manager.
 
 - MIDI input and therefore Voice and Rhythm Kit Downloads from the RM50 are not
 supported on Windows. The related functions are therefore greyed out. Please use
-a separate utility such a C6Sysex Manager or MIDI-OX to download and save to
+a separate utility such as C6Sysex Manager or MIDI-OX to download and save to
 files Voice or Rhythm Kits from the RM50 and then load them into the
 RM50 Manager from files.
 
