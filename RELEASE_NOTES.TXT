@@ -1,28 +1,53 @@
 Release Notes:
 ==============
 
-- setting 'Wave' to '256:--off---' in the Voice Editor will be ignored by the RM50, to apply this change to the RM50 you need to click on 'Upload via MIDI to RM50' to reupload the whole voice.
+- setting 'Wave' to '256:--off---' in the Voice Editor will be ignored by the
+RM50, to apply this change to the RM50 you need to click on 'Upload via MIDI
+to RM50' to reupload the whole voice. This is a limitation of the RM50
+parameter change messages, not of the RM50 Manager software.
 
-- the SY77/TG77 card W7732 (Syn Wave 2) is not yet recognized, if you load a Voice that uses this card you will get a pop-up error complaining about an unknow card ID number. Please post the Card ID number on the related Yamaha Forums UK thread (see below) so I can add support for this card.
+- the SY77/TG77 card W7732 (Syn Wave 2) is not yet recognized, if you load a
+Voice that uses this card you will get a pop-up error complaining about an
+unknown card ID number. Please post the Card ID number on the related Yamaha
+Forums UK thread (see below) so I can add support for this card.
 
-- the waveforms of the RSC3003 House & Rap card lack names as I haven't located a list of all waveform names of this card yet. If you happen to have the booklet that comes with this card which includes the waveform names list, please scan it and provide the scanned list on the related Yamaha Forums UK thread (see below) so I can add the waveform names for this card to the RM50 Manager.
+- the waveforms of the RSC3003 House & Rap card lack names as I haven't located
+a list of all waveform names of this card yet. If you happen to have the booklet
+that comes with this card which includes the waveform names list, please scan it
+and provide the scanned list on the related Yamaha Forums UK thread (see below)
+so I can add the waveform names for this card to the RM50 Manager.
 
-- MIDI input and therefore Voice and Rhythm Kit Downloads from the RM50 are not supported on Windows. The related functions are therefore greyed out. Please use a separate utility such a C6Sysex Manager or MIDI-OX to download and save to files Voice or Rhythm Kits from the RM50 and then load them into the RM50 Manager from files.
+- MIDI input and therefore Voice and Rhythm Kit Downloads from the RM50 are not
+supported on Windows. The related functions are therefore greyed out. Please use
+a separate utility such a C6Sysex Manager or MIDI-OX to download and save to
+files Voice or Rhythm Kits from the RM50 and then load them into the
+RM50 Manager from files.
 
-- the RM50 Manager only supports plain binary sysex files that start with 'F0' hex and end with 'F7' hex. ASCII sysex files or standard MIDI files that include sysex dumps aren't supported.
+- the RM50 Manager only supports plain binary sysex files that start with
+'F0' hex and end with 'F7' hex. ASCII sysex files or standard MIDI files that
+include sysex dumps aren't supported.
 
-- Voice and Rythm Kit Name changes are not trasmitted to the RM50 in real time. Use the 'Upload via MIDI to RM50' button instead.
+- Voice and Rythm Kit Name changes are not trasmitted to the RM50 in real time.
+Use the 'Upload via MIDI to RM50' button instead.
 
-- On Windows the available MIDI Devices list is updated only once when the RM50 Manager is launched. Any changes to the available MIDI Devices while the RM50 Manager is running are ignored.
+- On Windows the available MIDI Devices list is updated only once when the RM50
+Manager is launched. Any changes to the available MIDI Devices while the RM50
+Manager is running are ignored.
 
-- On Windows physically unplugging the MIDI Device currently in use by the RM50 Manager or selecting a MIDI Device that's no longer available could cause the RM50 Manager to hang or crash.
+- On Windows physically unplugging the MIDI Device currently in use by the
+RM50 Manager or selecting a MIDI Device that's no longer available could cause
+the RM50 Manager to hang or crash.
 
 
-For any questions, comments, suggestions or bug reports please post on the following thread of the Yamaha Forums UK:
+For any questions, comments, suggestions or bug reports please post on the
+following thread of the Yamaha Forums UK:
 http://www.yamahaforums.co.uk/forum/viewtopic.php?f=9&t=5915
 
-If you are running the RM50 Manager on Linux then you can also post on the related thread on the LinuxMusicians forum:
+If you are running the RM50 Manager on Linux then you can also post on the
+related thread on the LinuxMusicians forum:
 http://www.linuxmusicians.com/viewtopic.php?f=24&t=10412
 
-For more info on the RM50 and related links and downloads visit my Yamaha RM50 page:
+For more info on the Yamaha RM50 and related links and downloads visit my
+Yamaha RM50 page:
 http://www.linuxtech.net/musicgear/synth_yamaha_rm50.html
+
