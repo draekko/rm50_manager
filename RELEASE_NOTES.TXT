@@ -6,11 +6,6 @@ RM50, to apply this change to the RM50 you need to click on 'Upload via MIDI
 to RM50' to reupload the whole voice. This is a limitation of the RM50
 parameter change messages, not of the RM50 Manager software.
 
-- the SY77/TG77 card W7732 (Syn Wave 2) is not yet recognized, if you load a
-Voice that uses this card you will get a pop-up error complaining about an
-unknown card ID number. Please post the Card ID number on the related Yamaha
-Forums UK thread (see below) so I can add support for this card.
-
 - the waveforms of the RSC3003 House & Rap card lack names as I haven't located
 a list of all waveform names of this card yet. If you happen to have the booklet
 that comes with this card which includes the waveform names list, please scan it
