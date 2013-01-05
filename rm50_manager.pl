@@ -436,7 +436,7 @@ my %waveid=(
     'RSC3001' => 11, 'RSC3002' => 12, 'RSC3003' => 15, 'RSC3004' => 16,
     'RSC3071' => 17, 'RSC3072' => 18, 'RSC3073' => 19, 'RSC3074' => 20,
     'W7701'   =>  3, 'W7702'   =>  2, 'W7704'   =>  7, 'W7705'   =>  0,
-    'W7731'   =>  6, 'W7732'   => '', 'W7751'   =>  4, 'W7752'   =>  9 );
+    'W7731'   =>  6, 'W7732'   => 10, 'W7751'   =>  4, 'W7752'   =>  9 );
 
 # Inserted Wave Cards (default to empty slots)
 my @wave_card=('', $wavecards[0], $wavecards[0], $wavecards[0]);
