@@ -2789,11 +2789,15 @@ sub Common_Frame {
     )->pack(-fill=>'x', -expand=>1, -padx=>10, -pady=>5);
 
 # Voice Name
+    # voice name window width: 8 for Linux, 9 for Windows
+    my $vcn_width;
+    if ($WINDOWS) { $vcn_width=9; } else { $vcn_width=8; }
+
     my $vname=$subframe->Frame()->grid(-columnspan=>2, -pady=>5);
 
     $vname->Label(-text=>'Voice Name (1-8 chars): ', -font=>'Sans 10')->grid(
     $vname->Entry(%Entry_defaults,
-        -width              => 8,
+        -width              => $vcn_width,
         -font               => 'Fixed 10',
         -validate           => 'key',
         -validatecommand    => sub {$_[0]=~/^[\x20-\x7F]{0,8}$/},
