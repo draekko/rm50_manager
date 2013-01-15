@@ -1382,8 +1382,8 @@ sub SysexWrite {
         Dec2Syx($dmp,114+$e, $pitch_eg_rate[$elm] );
         Dec2Syx($dmp,116+$e, ($del_first_note[$elm] *128) + ($delay_time[$elm] -1) );
         Dec2Syx($dmp,118+$e, (($delay_repetition[$elm] *32)
-                      + (abs((int($delay_lvl_offset[$elm] /($delay_lvl_offset[$elm]+ 0.1))*-32)  - $delay_lvl_offset[$elm])) ) );
-        Dec2Syx($dmp,120+$e, (abs((int($delay_pch_offset[$elm] /($delay_pch_offset[$elm]+ 0.01))*-256) - $delay_pch_offset[$elm])*10) );
+                           + ($delay_lvl_offset[$elm]<0 ?  32-abs($delay_lvl_offset[$elm])    : $delay_lvl_offset[$elm]) ) );
+        Dec2Syx($dmp,120+$e, ($delay_pch_offset[$elm]<0 ? 256-abs($delay_pch_offset[$elm]*10) : $delay_pch_offset[$elm]*10) );
         my ($velcnr)=($elm_velcurve[$elm]=~/^(\d+):.*/);
         Dec2Syx($dmp,122+$e, ($velcnr-1) );
     }
@@ -2791,7 +2791,7 @@ sub Common_Frame {
 # Voice Name
     # voice name window width: 8 for Linux, 9 for Windows
     my $vcn_width;
-    if ($WINDOWS) { $vcn_width=9; } else { $vcn_width=8; }
+    if ($WINDOWS) { $vcn_width=15; } else { $vcn_width=8; }
 
     my $vname=$subframe->Frame()->grid(-columnspan=>2, -pady=>5);
 
