@@ -81,7 +81,7 @@ Prerequisites:
 OS X
 ====
 
-The RM50 Manger should run on OS X too (without MIDI support), as long as you
+The RM50 Manager should run on OS X too (without MIDI support), as long as you
 have Perl, Perl-Tk and the Config::Simple module installed. I don't have access
 to any OS X machine so can't test this myself.
 
