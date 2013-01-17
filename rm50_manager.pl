@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#  Yamaha RM50 Manager version 1.1-beta1
+#  Yamaha RM50 Manager version 1.1
 #
 #  Copyright (C) 2012 LinuxTECH.NET
 #
@@ -21,7 +21,7 @@
 use strict;
 use warnings;
 
-my $version="1.1-beta1";
+my $version='1.1';
 
 use Tk;
 use Tk::Pane;
@@ -51,7 +51,7 @@ my $midi;
 my $midiIn;
 my $midiOut;
 if ($LINUX) {
-    MIDI::ALSA::client("RM50 manager PID_$$",1,1,1);
+    MIDI::ALSA::client("RM50 Manager PID_$$",1,1,1);
     MIDI::ALSA::start();
 } elsif ($WINDOWS) {
     $midi = new Win32API::MIDI;
@@ -848,7 +848,7 @@ sub exitProgam {
     }
 }
 
-# load a rm50 voice sysex dump file
+# load a RM50 voice sysex dump file
 sub loadFile {
     my $rtn="";
     if ($modified == 1) {
@@ -880,7 +880,7 @@ sub loadFile {
     }
 }
 
-# load a rm50 rhythm kit sysex dump file
+# load a RM50 rhythm kit sysex dump file
 sub loadKit {
         my $types=[ ['Sysex Files', ['.syx', '.SYX']], ['All Files', '*'] ];
         my $syx_file=$rywin->getOpenFile(
@@ -1232,7 +1232,7 @@ sub SysexRead {
     for (my $elm = 1; $elm <= 2; $elm++) {
         my $e=(52*($elm-1));
         # bits 6-7 0..2 (Preset, Wave Card, Internal RAM)
-        my $tmp                  =       int(Syx2Dec($dmp, 74+$e)/64);
+        my $tmp=int(Syx2Dec($dmp, 74+$e)/64);
         if    ($tmp==0) {$wave_source[$elm]=$wsources[0];}
         elsif ($tmp==2) {$wave_source[$elm]=$wsources[1];}
         elsif ($tmp==1) {
@@ -1557,16 +1557,6 @@ sub SendVcChMsg {
     my $bnk=($rybankshash{$ry_bank[$elm][$vnr]})/2;
     my ($vce)=($ry_voice[$elm][$vnr]=~/^(\d+):.*/);
     SendRyChMsg($elm,($vnr*10),$bnk,$vce-1);
-}
-
-# only for testing purposes
-sub Callbk {
-    print "---\n";
-    print "callback args  = @_\n";
-#    print "\$Tk::event     = $Tk::event\n";
-#    print "\$Tk::widget    = $Tk::widget\n";
-#    print "\$Tk::event->W  = ". $Tk::event->W ."\n";
-    $modified=1;
 }
 
 # send voice parameter change message (real time sysex) to RM50
