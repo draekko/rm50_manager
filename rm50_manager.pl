@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 #
-#  Yamaha RM50 Manager version 1.1
+#  Yamaha RM50 Manager version 1.1.1
 #
-#  Copyright (C) 2012 LinuxTECH.NET
+#  Copyright (C) 2012-2014 LinuxTECH.NET
 #
 #  Yamaha is a registered trademark of Yamaha Corporation.
 #
@@ -21,7 +21,7 @@
 use strict;
 use warnings;
 
-my $version='1.1';
+my $version='1.1.1';
 
 use Tk;
 use Tk::Pane;
@@ -1046,7 +1046,7 @@ sub About {
         -title   => 'About',
         -icon    => 'info',
         -message => "Yamaha\x{2122} RM50 Manager version $version\n
-         \x{00A9} 2012 LinuxTECH.NET\n\nYamaha is a registered trademark of Yamaha Corporation.",
+         \x{00A9} 2012-2014  LinuxTECH.NET\n\nYamaha is a registered trademark of Yamaha Corporation.",
         -type    => 'Ok',
         -default => 'Ok'
     );

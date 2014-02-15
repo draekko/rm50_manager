@@ -6,12 +6,6 @@ RM50, to apply this change to the RM50 you need to click on 'Upload via MIDI
 to RM50' to reupload the whole voice. This is a limitation of the RM50
 parameter change messages, not of the RM50 Manager software.
 
-- the waveforms of the RSC3003 House & Rap card lack names as I haven't located
-a list of all waveform names of this card yet. If you happen to have the booklet
-that comes with this card which includes the waveform names list, please scan it
-and provide the scanned list on the related Yamaha Forums UK thread (see below)
-so I can add the waveform names for this card to the RM50 Manager.
-
 - MIDI input and therefore Voice and Rhythm Kit Downloads from the RM50 are not
 supported on Windows. The related functions are therefore greyed out. Please use
 a separate utility such as C6Sysex Manager or MIDI-OX to download and save to
