@@ -181,10 +181,10 @@ my @RSC3002=(
 
 # RSC3003 House & Rap card Waveforms
 my @RSC3003=qw(
-    01:  02:  03:  04:  05:  06:  07:  08:
-    09:  10:  11:  12:  13:  14:  15:  16:
-    17:  18:  19:  20:  21:  22:  23:  24:
-    25:  26:  27:  28:  29:  30:  31:  32: );
+    01:RemixBD  02:TronikBD  03:LooseBD  04:CleanBD  05:BlastBD  06:DoomBD   07:VeraSN   08:TightSN
+    09:RoomySN  10:SplashSN  11:EdgeSN   12:GaytorSN 13:Jungle   14:HHClosed 15:HHOpen   16:FingaCym
+    17:AnaBonk  18:AnaDonk   19:Cabasa   20:Maracas  21:Tambo!   22:Glassie  23:Metallik 24:GtrBlast
+    25:TapeStop 26:NoizeHit  27:VinylZip 28:IsssVox  29:DaahVox  30:DabaVox  31:EeesVox  32:UaahVox );
 
 # RSC3004 Dance & Soul card Waveforms
 my @RSC3004=qw(
