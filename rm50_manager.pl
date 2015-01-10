@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 #
-#  Yamaha RM50 Manager version 1.1.1
+#  Yamaha RM50 Manager version 1.1.2
 #
-#  Copyright (C) 2012-2014 LinuxTECH.NET
+#  Copyright (C) 2012-2015 LinuxTECH.NET
 #
 #  Yamaha is a registered trademark of Yamaha Corporation.
 #
@@ -21,7 +21,7 @@
 use strict;
 use warnings;
 
-my $version='1.1.1';
+my $version='1.1.2';
 
 use Tk;
 use Tk::Pane;
@@ -863,6 +863,7 @@ sub loadFile {
         );
         if ($syx_file && -r $syx_file) {
             open my $fh, '<', $syx_file;
+            binmode $fh;
             my $tmp_dump = do { local $/; <$fh> };
             close $fh;
             my $check=SysexValidate($tmp_dump);
@@ -890,6 +891,7 @@ sub loadKit {
         );
         if ($syx_file && -r $syx_file) {
             open my $fh, '<', $syx_file;
+            binmode $fh;
             my $tmp_dump = do { local $/; <$fh> };
             close $fh;
             my $check=RySyxValidate(\$tmp_dump);
@@ -933,6 +935,7 @@ sub saveasFile {
         SysexWrite();
         my $chksum=chksumCalc(\$sysex_dump);
         substr($sysex_dump,176,1,chr($chksum));
+        binmode $fh;
         print $fh $sysex_dump;
         close $fh;
         $modified=0;
@@ -957,6 +960,7 @@ sub saveasKit {
         RySyxWrite(\$ry_syx_dump);
         my $chksum=chksumCalc(\$ry_syx_dump);
         substr($ry_syx_dump,466,1,chr($chksum));
+        binmode $fh;
         print $fh $ry_syx_dump;
         close $fh;
         $ryfilename=$syx_file;
@@ -974,6 +978,7 @@ sub saveFile {
         SysexWrite();
         my $chksum=chksumCalc(\$sysex_dump);
         substr($sysex_dump,176,1,chr($chksum));
+        binmode $fh;
         print $fh $sysex_dump;
         close $fh;
         $modified=0;
@@ -993,6 +998,7 @@ sub saveKit {
         RySyxWrite(\$ry_syx_dump);
         my $chksum=chksumCalc(\$ry_syx_dump);
         substr($ry_syx_dump,466,1,chr($chksum));
+        binmode $fh;
         print $fh $ry_syx_dump;
         close $fh;
     } else {
@@ -1046,7 +1052,7 @@ sub About {
         -title   => 'About',
         -icon    => 'info',
         -message => "Yamaha\x{2122} RM50 Manager version $version\n
-         \x{00A9} 2012-2014  LinuxTECH.NET\n\nYamaha is a registered trademark of Yamaha Corporation.",
+         \x{00A9} 2012-2015  LinuxTECH.NET\n\nYamaha is a registered trademark of Yamaha Corporation.",
         -type    => 'Ok',
         -default => 'Ok'
     );
